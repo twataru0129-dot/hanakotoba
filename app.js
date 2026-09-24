@@ -11,19 +11,21 @@
   const APP = {
     name: '花言葉',
     subtitle: '想いにぴったりの花を見つけよう',
-    version: '1.0.0',
-    versionLabel: 'v1.0',
+    version: '1.1.0',
+    versionLabel: 'v1.1',
     // 写真: images/flowers/<id>.<ext> を置くと自動で表示されます。
     // 花データに image: 'rose.jpg' のように書くと個別に指定できます。
     photoDir: 'images/flowers/',
     photoExt: 'webp',
     usePhotos: true,
     storageKey: 'hanakotoba.favorites.v1',
-    referenceUrl: 'https://andplants.jp/blogs/magazine/flowerlanguage-list'
+    referenceUrl: 'https://andplants.jp/blogs/magazine/flowerlanguage-list',
+    birthdayReferenceUrl: 'https://hananokotoba.com/calendar/'
   };
 
   const TAX = window.HANA_TAXONOMY;
   const RAW = window.HANA_FLOWERS || [];
+  const BIRTHDAYS = window.HANA_BIRTHDAYS || {};
 
   /* =========================================================
    * ユーティリティ
@@ -66,15 +68,37 @@
     return c;
   }
 
+  // 花言葉の重複判定用：空白・全角半角・句読点・記号の違いを無視
+  const meaningKey = (m) => norm(m).replace(/[。、．，.,!！?？・「」『』"'〜~ー―-]/g, '');
+  function uniqueMeanings(list) {
+    const seen = new Set();
+    return list.map((m) => String(m).trim()).filter((m) => {
+      const k = meaningKey(m);
+      if (!k || seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+
+  // 誕生花：birthdays.js（日付 → 花 id）から「花 id → 日付」を逆引き
+  const BIRTH_DATES = {};
+  Object.keys(BIRTHDAYS).sort().forEach((md) => {
+    (BIRTHDAYS[md] || []).forEach((id) => { (BIRTH_DATES[id] = BIRTH_DATES[id] || []).push(md); });
+  });
+
   FLOWERS.forEach((f, i) => {
-    f.colorMeanings = f.colorMeanings || [];
+    f.aliases = f.aliases || [];
+    f.meanings = uniqueMeanings(f.meanings || []);
+    f.colorMeanings = (f.colorMeanings || []).map((c) => Object.assign({}, c, { meanings: uniqueMeanings(c.meanings || []) }));
     f.categories = f.categories || [];
     f.recipients = f.recipients || [];
     f.scenes = f.scenes || [];
+    f.bloomingMonths = f.bloomingMonths || [];
+    f.birthDates = BIRTH_DATES[f.id] || [];
     f._order = i;
-    f._name = norm(f.name) + ' ' + norm(f.kana);
+    f._name = [f.name, f.kana].concat(f.aliases).map(norm).join(' ');
     const allMeanings = f.meanings.concat(...f.colorMeanings.map((c) => c.meanings));
-    f._allMeanings = Array.from(new Set(allMeanings));
+    f._allMeanings = uniqueMeanings(allMeanings);
     f._meaning = norm(f._allMeanings.join(' '));
     f._category = norm([
       ...f.categories.map((id) => feelingMap[id] && feelingMap[id].label),
@@ -164,6 +188,62 @@
   }
   const dateKey = (d) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
   const dateLabel = (d) => `${d.getMonth() + 1}月${d.getDate()}日`;
+
+  /* =========================================================
+   * 誕生花・月（日付は年に依存しない "MM-DD" で扱う）
+   * ======================================================= */
+  const pad2 = (n) => String(n).padStart(2, '0');
+  // 誕生花検索用：2月は常に29日まで選べる
+  const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  // 端末のローカル日付から MM-DD を作る（UTC に変換しないのでタイムゾーンずれが起きない）
+  const mdOf = (d) => `${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  function parseMD(md) {
+    const m = /^(\d{2})-(\d{2})$/.exec(md || '');
+    if (!m) return null;
+    const month = +m[1];
+    const day = +m[2];
+    if (month < 1 || month > 12 || day < 1 || day > DAYS_IN_MONTH[month - 1]) return null;
+    return { month, day };
+  }
+  const mdLabel = (md) => { const p = parseMD(md); return p ? `${p.month}月${p.day}日` : md; };
+  const birthdayFlowers = (md) => (BIRTHDAYS[md] || []).map((id) => FLOWER_MAP[id]).filter(Boolean);
+  function monthBirthdayFlowers(month) {
+    const ids = [];
+    for (let d = 1; d <= DAYS_IN_MONTH[month - 1]; d++) {
+      (BIRTHDAYS[`${pad2(month)}-${pad2(d)}`] || []).forEach((id) => { if (!ids.includes(id)) ids.push(id); });
+    }
+    return FLOWERS.filter((f) => ids.includes(f.id));
+  }
+  const monthBloomFlowers = (month) => FLOWERS.filter((f) => f.bloomingMonths.includes(month));
+
+  const SEASONS = [
+    { label: '春', months: [3, 4, 5] }, { label: '夏', months: [6, 7, 8] },
+    { label: '秋', months: [9, 10, 11] }, { label: '冬', months: [12, 1, 2] }
+  ];
+  const seasonsOf = (months) => SEASONS.filter((s) => s.months.some((m) => months.includes(m))).map((s) => s.label);
+
+  // [1,2,3,10,11,12] → 「10〜3月」のように、年をまたぐ連続もまとめて表示
+  function formatMonths(months) {
+    const set = new Set(months);
+    if (!set.size) return '';
+    if (set.size === 12) return '通年';
+    const next = (m) => (m % 12) + 1;
+    const prev = (m) => ((m + 10) % 12) + 1;
+    // 直前の月が含まれない月を起点にすると、年をまたぐ範囲も1つにまとまる
+    const start = [...Array(12)].map((_, k) => k + 1).find((m) => set.has(m) && !set.has(prev(m)));
+    const ranges = [];
+    let run = null;
+    for (let k = 0, m = start; k < 12; k++, m = next(m)) {
+      if (set.has(m)) {
+        if (run) run[1] = m; else run = [m, m];
+      } else if (run) {
+        ranges.push(run);
+        run = null;
+      }
+    }
+    if (run) ranges.push(run);
+    return ranges.map(([a, b]) => (a === b ? `${a}月` : `${a}〜${b}月`)).join('、');
+  }
 
   /* =========================================================
    * 花のイラスト（写真がないとき用の SVG）
@@ -313,6 +393,10 @@
     leaf: '<path d="M5 19c0-8 5-14 15-14 0 10-6 15-14 15"/><path d="M5 19l8-8"/>',
     book: '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/>',
     bulb: '<path d="M9 17.5h6M10 20.5h4"/><path d="M12 3.5a5.5 5.5 0 0 0-3.3 9.9c.6.5 1 1.2 1 2V15h4.6v-.1c0-.8.4-1.5 1-2A5.5 5.5 0 0 0 12 3.5z"/>',
+    cake: '<path d="M4.5 20.5h15M5.5 20.5v-7a1.5 1.5 0 0 1 1.5-1.5h10a1.5 1.5 0 0 1 1.5 1.5v7"/><path d="M5.5 15.5c1.2 0 1.6-1 3.2-1s1.6 1 3.3 1 1.7-1 3.3-1 1.9 1 3.2 1M12 12V9"/><path d="M12 4.2c.9 1 1.3 1.8 1.3 2.5a1.3 1.3 0 0 1-2.6 0c0-.7.4-1.5 1.3-2.5z"/>',
+    grid: '<rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4M8 13.5h1.5M11.25 13.5h1.5M14.5 13.5H16M8 16.8h1.5M11.25 16.8h1.5"/>',
+    tulip: '<path d="M12 21v-8.5"/><path d="M12 12.5c-3.6 0-5.5-2.6-5.5-6.3 1.6.6 2.8 1.6 3.5 2.8.4-2 1.1-3.6 2-4.8.9 1.2 1.6 2.8 2 4.8.7-1.2 1.9-2.2 3.5-2.8 0 3.7-1.9 6.3-5.5 6.3z"/><path d="M12 18c-1.7-1.9-3.8-2.5-5.5-2.2.5 2.2 2.6 3.6 5.5 3.7M12 17.4c1.5-1.5 3.3-2 4.8-1.7-.4 1.9-2.2 3.1-4.8 3.2"/>',
+    info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r="1" fill="currentColor"/>',
     palette: '<path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.2 0 1.8-.8 1.8-1.6 0-1.2-1-1.4-1-2.5 0-.9.7-1.4 1.6-1.4h2.1a4 4 0 0 0 4-4c0-4.2-3.8-7.5-8.5-7.5z"/><circle cx="7.8" cy="11" r="1.1" fill="currentColor"/><circle cx="10.5" cy="7.4" r="1.1" fill="currentColor"/><circle cx="15" cy="7.8" r="1.1" fill="currentColor"/>'
   };
   const icon = (name, cls) => `<svg class="icon ${cls || ''}" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${ICONS[name] || ''}</svg>`;
@@ -337,7 +421,7 @@
       + `<h3 class="flower-name">${esc(f.name)}</h3>`
       + `<p class="flower-kana">${esc(f.kana)}</p>`
       + `<p class="flower-meanings">${meanings}</p>`
-      + (o.reason ? `<p class="flower-reason">${esc(f.point)}</p>` : '')
+      + (o.reason && f.point ? `<p class="flower-reason">${esc(f.point)}</p>` : '')
       + `</div></a>`
       + favButton(f, 'fav-on-card')
       + `</article></li>`;
@@ -390,8 +474,8 @@
 
   function footer() {
     return `<footer class="app-footer">`
-      + `<p class="footer-note">花言葉には諸説があります。</p>`
-      + `<p class="footer-ref">情報整理の参考：<a href="${APP.referenceUrl}" target="_blank" rel="noopener noreferrer">AND PLANTS 花言葉一覧</a></p>`
+      + `<p class="footer-note">花言葉や誕生花には諸説があります。</p>`
+      + `<p class="footer-ref">情報整理の参考：<a href="${APP.referenceUrl}" target="_blank" rel="noopener noreferrer">AND PLANTS 花言葉一覧</a>／<a href="${APP.birthdayReferenceUrl}" target="_blank" rel="noopener noreferrer">花言葉-由来 誕生花カレンダー</a></p>`
       + `<p class="footer-small">本アプリは個人制作の非公式アプリで、参考サイトの運営者とは関係ありません。掲載文章はオリジナルです。</p>`
       + `<p class="footer-version">${APP.name} ${APP.versionLabel}</p>`
       + `</footer>`;
@@ -400,7 +484,7 @@
   /* =========================================================
    * 画面
    * ======================================================= */
-  const state = { queries: { home: '', flowers: '', meanings: '' } };
+  const state = { queries: { home: '', flowers: '', meanings: '' }, monthTab: 'bloom' };
 
   const MENU = [
     { href: '#/flowers', icon: 'flower', label: '花から探す', sub: '名前で一覧', tone: 'rose' },
@@ -409,9 +493,28 @@
     { href: '#/recipients', icon: 'gift', label: '贈る相手から探す', sub: '家族・友人…', tone: 'lav' },
     { href: '#/scenes', icon: 'scene', label: 'シーンから探す', sub: '誕生日・卒業…', tone: 'sky' },
     { href: '#/kana', icon: 'kana', label: '五十音から探す', sub: 'あ〜わ行', tone: 'mint' },
+    { href: '#/birthday', icon: 'cake', label: '誕生日から探す', sub: '月と日を選ぶ', tone: 'peach' },
+    { href: '#/calendar', icon: 'grid', label: '誕生花カレンダー', sub: '366日の誕生花', tone: 'pink' },
+    { href: '#/months', icon: 'tulip', label: '月から探す', sub: '咲く花・誕生花', tone: 'mint' },
     { href: '#/favorites', icon: 'star', label: 'お気に入り', sub: '保存した花', tone: 'rose' },
-    { href: '#random', icon: 'shuffle', label: 'ランダムな花', sub: '今日の出会い', tone: 'gold', random: true }
+    { href: '#random', icon: 'shuffle', label: 'ランダムな花', sub: '今日の出会い', tone: 'gold', random: true },
+    { href: '#/about', icon: 'info', label: 'このアプリについて', sub: '収録数・注意書き', tone: 'lav' }
   ];
+
+  // 誕生花・月の画面で使う部品
+  const MONTHS = [...Array(12)].map((_, i) => i + 1);
+  function monthNav(route, active, label) {
+    return `<nav class="month-nav" aria-label="${esc(label || '月を選ぶ')}"><ul role="list">`
+      + MONTHS.map((m) => `<li><a class="month-btn ${m === active ? 'is-active' : ''}" href="#/${route}/${pad2(m)}" data-replace="1" ${m === active ? 'aria-current="page"' : ''}>${m}月</a></li>`).join('')
+      + `</ul></nav>`;
+  }
+  function miniFlowerList(list) {
+    return `<ul class="mini-list" role="list">` + list.map((f) => `<li><a class="mini-flower" href="#/flower/${esc(f.id)}">`
+      + flowerArt(f, 'art-mini')
+      + `<span class="mini-text"><span class="mini-name">${esc(f.name)}</span><span class="mini-meaning">${esc(quote(f.meanings.slice(0, 1)))}</span></span></a></li>`).join('')
+      + `</ul>`;
+  }
+  const birthdayNote = `<p class="soft-note">誕生花は資料によって異なり、諸説があります。</p>`;
 
   const Views = {
     home() {
@@ -441,6 +544,7 @@
           + `</div>`
           + flowerArt(tf, 'art-today')
           + `</a></section>`
+          + todayBirthday(today)
           + `<section aria-labelledby="menu-title"><h2 class="section-title" id="menu-title">花をさがす</h2>`
           + `<ul class="menu-grid" role="list">`
           + MENU.map((m) => `<li><a class="menu-card tone-${m.tone}" href="${m.href}" ${m.random ? 'data-random="1"' : ''}>`
@@ -449,6 +553,118 @@
           + `</ul></section>`
           + `<p class="home-count">いま <strong>${FLOWERS.length}</strong> 種類の花を収録しています</p>`
           + `</div>`
+      };
+    },
+
+    birthday(mm) {
+      const month = +mm || 0;
+      const valid = month >= 1 && month <= 12;
+      return {
+        title: '誕生日から探す',
+        html: pageHead('誕生日から探す', '生まれた月と日を選ぶと、その日の誕生花がわかります。')
+          + `<h2 class="step-title"><span class="step-no">1</span>月を選ぶ</h2>`
+          + monthNav('birthday', valid ? month : 0, '誕生日の月')
+          + (valid
+            ? `<h2 class="step-title"><span class="step-no">2</span>${month}月の何日？</h2>`
+              + `<ul class="day-grid" role="list">`
+              + [...Array(DAYS_IN_MONTH[month - 1])].map((_, i) => {
+                const md = `${pad2(month)}-${pad2(i + 1)}`;
+                return `<li><a class="day-btn" href="#/date/${md}" aria-label="${month}月${i + 1}日の誕生花">${i + 1}</a></li>`;
+              }).join('')
+              + `</ul>`
+              + (month === 2 ? `<p class="soft-note">2月29日生まれの方の誕生花も調べられます。</p>` : '')
+            : `<p class="hint">上から生まれた月を選んでください。</p>`)
+          + birthdayNote
+      };
+    },
+
+    calendar(mm) {
+      const now = new Date();
+      const month = (+mm >= 1 && +mm <= 12) ? +mm : now.getMonth() + 1;
+      const todayMD = mdOf(now);
+      let cells = '';
+      for (let d = 1; d <= DAYS_IN_MONTH[month - 1]; d++) {
+        const md = `${pad2(month)}-${pad2(d)}`;
+        const list = birthdayFlowers(md);
+        const names = list.slice(0, 2).map((f) => `<span class="cal-name">${esc(f.name)}</span>`).join('');
+        cells += `<li><a class="cal-cell ${md === todayMD ? 'is-today' : ''}" href="#/date/${md}" aria-label="${month}月${d}日の誕生花：${esc(list.map((f) => f.name).join('、'))}">`
+          + `<span class="cal-day">${d}${md === todayMD ? '<span class="cal-today">今日</span>' : ''}</span>${names}`
+          + (list.length > 2 ? `<span class="cal-more">ほか${list.length - 2}種</span>` : '')
+          + `</a></li>`;
+      }
+      return {
+        title: '誕生花カレンダー',
+        html: pageHead('誕生花カレンダー', '1年366日の誕生花を月ごとに見られます。日付をタップすると詳しく表示します。')
+          + monthNav('calendar', month, '表示する月')
+          + `<h2 class="section-title cal-title">${month}月の誕生花</h2>`
+          + `<ul class="cal-grid" role="list">${cells}</ul>`
+          + birthdayNote
+      };
+    },
+
+    date(md) {
+      const p = parseMD(md);
+      if (!p) return Views.notFound();
+      const list = birthdayFlowers(md);
+      const prevMD = (() => { let m = p.month; let d = p.day - 1; if (d < 1) { m = m === 1 ? 12 : m - 1; d = DAYS_IN_MONTH[m - 1]; } return `${pad2(m)}-${pad2(d)}`; })();
+      const nextMD = (() => { let m = p.month; let d = p.day + 1; if (d > DAYS_IN_MONTH[m - 1]) { m = m === 12 ? 1 : m + 1; d = 1; } return `${pad2(m)}-${pad2(d)}`; })();
+      return {
+        title: `${p.month}月${p.day}日の誕生花`,
+        html: pageHead(`${p.month}月${p.day}日の誕生花`, list.length > 1 ? `この日の誕生花は${list.length}種類あります。` : '')
+          + `<nav class="day-pager" aria-label="前後の日">`
+          + `<a class="btn btn-ghost btn-small" href="#/date/${prevMD}" data-replace="1" aria-label="前の日（${mdLabel(prevMD)}）">${icon('back')}${mdLabel(prevMD)}</a>`
+          + `<a class="btn btn-ghost btn-small" href="#/date/${nextMD}" data-replace="1" aria-label="次の日（${mdLabel(nextMD)}）">${mdLabel(nextMD)}${icon('chevron')}</a>`
+          + `</nav>`
+          + cardGrid(list, { emptyText: 'この日の誕生花はまだ登録されていません' })
+          + `<p class="center"><a class="btn btn-ghost btn-small" href="#/calendar/${pad2(p.month)}">${p.month}月のカレンダーを見る</a></p>`
+          + birthdayNote
+      };
+    },
+
+    months(mm) {
+      const month = +mm;
+      if (!mm) {
+        return {
+          title: '月から探す',
+          html: pageHead('月から探す', '月を選ぶと、その月に咲く花と、その月の誕生花を見られます。')
+            + `<ul class="month-grid" role="list">`
+            + MONTHS.map((m) => `<li><a class="month-tile" href="#/months/${pad2(m)}">`
+              + `<span class="month-num">${m}<small>月</small></span>`
+              + `<span class="month-meta">咲く花 ${monthBloomFlowers(m).length}種<br>誕生花 ${monthBirthdayFlowers(m).length}種</span></a></li>`).join('')
+            + `</ul>`
+        };
+      }
+      if (!(month >= 1 && month <= 12)) return Views.notFound();
+      return {
+        title: `${month}月の花`,
+        html: pageHead(`${month}月の花`, '')
+          + monthNav('months', month, '表示する月')
+          + `<div class="seg" role="tablist" aria-label="表示の切り替え">`
+          + `<button type="button" class="seg-btn" role="tab" id="tab-bloom" aria-controls="month-panel" aria-selected="${state.monthTab !== 'birth'}" data-month-tab="bloom">${month}月に咲く花 <span class="seg-count">${monthBloomFlowers(month).length}</span></button>`
+          + `<button type="button" class="seg-btn" role="tab" id="tab-birth" aria-controls="month-panel" aria-selected="${state.monthTab === 'birth'}" data-month-tab="birth">${month}月の誕生花 <span class="seg-count">${monthBirthdayFlowers(month).length}</span></button>`
+          + `</div>`
+          + `<div id="month-panel" role="tabpanel" data-month="${month}">${monthPanel(month)}</div>`
+      };
+    },
+
+    about() {
+      const withBirth = FLOWERS.filter((f) => f.birthDates.length).length;
+      const days = Object.keys(BIRTHDAYS).length;
+      return {
+        title: 'このアプリについて',
+        html: pageHead('このアプリについて', APP.subtitle)
+          + `<ul class="stat-grid" role="list">`
+          + `<li class="stat"><span class="stat-num">${FLOWERS.length}</span><span class="stat-label">種類の花を収録</span></li>`
+          + `<li class="stat"><span class="stat-num">${days}</span><span class="stat-label">日分の誕生花</span></li>`
+          + `<li class="stat"><span class="stat-num">${withBirth}</span><span class="stat-label">種類が誕生花に登場</span></li>`
+          + `</ul>`
+          + `<section class="panel"><h2 class="panel-title">${icon('info')}ご利用にあたって</h2>`
+          + `<p>花言葉や誕生花は、国や時代、資料によって異なり、諸説があります。本アプリでは広く紹介されている代表的なものを掲載しています。</p>`
+          + `<p class="panel-p">お気に入りはこの端末のブラウザ内にだけ保存されます。</p></section>`
+          + `<section class="panel"><h2 class="panel-title">${icon('book')}参考にした情報</h2>`
+          + `<p>花言葉の整理には <a href="${APP.referenceUrl}" target="_blank" rel="noopener noreferrer">AND PLANTS 花言葉一覧</a>、誕生花の日付には <a href="${APP.birthdayReferenceUrl}" target="_blank" rel="noopener noreferrer">花言葉-由来 誕生花カレンダー</a> などを参考にしました。</p>`
+          + `<p class="panel-p">本アプリは個人制作の非公式アプリで、各サイトの運営者とは関係ありません。解説文はオリジナルで、画像の転載は行っていません。</p></section>`
+          + `<p class="center soft-note">${APP.name} ${APP.versionLabel}</p>`
       };
     },
 
@@ -573,6 +789,11 @@
       if (!f) return Views.notFound();
       const tagLinks = (ids, map, route) => ids.filter((x) => map[x]).map((x) => `<a class="tag" href="#/${route}/${x}">${esc(map[x].label)}</a>`).join('');
       const recommend = tagLinks(f.recipients, recipientMap, 'recipients') + tagLinks(f.scenes, sceneMap, 'scenes');
+      // 情報がある項目だけを表示する
+      const panel = (key, ic, title, body, cls) => (body ? `<section class="panel ${cls || ''}" aria-labelledby="d-${key}"><h2 class="panel-title" id="d-${key}">${icon(ic)}${title}</h2>${body}</section>` : '');
+      const bloom = f.season || formatMonths(f.bloomingMonths);
+      const seasons = seasonsOf(f.bloomingMonths);
+      const birth = f.birthDates.map((md) => `<a class="tag tag-date" href="#/date/${md}">${mdLabel(md)}</a>`).join('');
       return {
         title: f.name,
         html: `<article class="detail">`
@@ -580,7 +801,8 @@
           + `<header class="detail-head">`
           + `<p class="detail-kana">${esc(f.kana)}</p>`
           + `<h1 class="detail-name" tabindex="-1">${esc(f.name)}</h1>`
-          + `<p class="detail-desc">${esc(f.description)}</p>`
+          + (f.aliases.length ? `<p class="detail-alias"><span class="visually-hidden">別名：</span>${f.aliases.map(esc).join('・')}</p>` : '')
+          + (f.description ? `<p class="detail-desc">${esc(f.description)}</p>` : '')
           + `</header>`
           + `<section class="panel panel-meanings" aria-labelledby="d-meanings"><h2 class="panel-title" id="d-meanings">${icon('quote')}代表的な花言葉</h2>`
           + `<ul class="meaning-list" role="list">${f.meanings.map((m) => `<li>「${esc(m)}」</li>`).join('')}</ul></section>`
@@ -590,16 +812,18 @@
               + `<span class="color-name">${esc(c.color)}</span>`
               + `<span class="color-words">${esc(quote(c.meanings))}${c.note ? `<small class="color-note">※${esc(c.note)}</small>` : ''}</span></li>`).join('')
             + `</ul></section>` : '')
-          + `<section class="panel" aria-labelledby="d-origin"><h2 class="panel-title" id="d-origin">${icon('book')}花言葉の由来</h2><p>${esc(f.origin)}</p></section>`
-          + (recommend ? `<section class="panel" aria-labelledby="d-rec"><h2 class="panel-title" id="d-rec">${icon('gift')}こんな人・場面におすすめ</h2><div class="tag-list">${recommend}</div></section>` : '')
-          + `<section class="panel panel-inline" aria-labelledby="d-season"><h2 class="panel-title" id="d-season">${icon('leaf')}開花時期</h2><p>${esc(f.season)}</p></section>`
-          + `<section class="panel" aria-labelledby="d-trivia"><h2 class="panel-title" id="d-trivia">${icon('bulb')}豆知識</h2><p>${esc(f.trivia)}</p></section>`
+          + panel('origin', 'book', '花言葉の由来', f.origin ? `<p>${esc(f.origin)}</p>` : '')
+          + panel('birth', 'cake', '誕生花', birth ? `<div class="tag-list">${birth}</div>` : '')
+          + panel('rec', 'gift', 'こんな人・場面におすすめ', recommend ? `<div class="tag-list">${recommend}</div>` : '')
+          + panel('season', 'leaf', '開花時期', bloom ? `<p>${esc(bloom)}</p>` + (seasons.length ? `<p class="season-tags">${seasons.map((x) => `<span class="season-tag">${x}</span>`).join('')}</p>` : '') : '')
+          + panel('alias', 'flower', '別名', f.aliases.length ? `<p>${f.aliases.map(esc).join('、')}</p>` : '')
+          + panel('trivia', 'bulb', '豆知識', f.trivia ? `<p>${esc(f.trivia)}</p>` : '')
           + (f.categories.length ? `<section class="panel" aria-labelledby="d-feel"><h2 class="panel-title" id="d-feel">${icon('heart')}こんな気持ちに</h2><div class="tag-list">${tagLinks(f.categories, feelingMap, 'feelings')}</div></section>` : '')
           + `<div class="detail-actions">`
           + `<button type="button" class="btn btn-primary btn-block" data-share="${esc(f.id)}">${icon('share')}この花言葉をシェア</button>`
           + `<button type="button" class="btn btn-ghost btn-block" data-random="1">${icon('shuffle')}ほかの花にランダムで出会う</button>`
           + `</div>`
-          + `<p class="detail-note">花言葉には諸説あります。ここでは広く紹介されている代表的なものを掲載しています。</p>`
+          + `<p class="detail-note">花言葉や誕生花には諸説あります。ここでは広く紹介されている代表的なものを掲載しています。</p>`
           + `</article>`
       };
     },
@@ -612,6 +836,29 @@
       };
     }
   };
+
+  function todayBirthday(now) {
+    const md = mdOf(now);
+    const list = birthdayFlowers(md);
+    if (!list.length) return '';
+    return `<section class="birth-today" aria-labelledby="birth-title" data-today="${dateKey(now)}">`
+      + `<div class="birth-head"><p class="today-label" id="birth-title">${icon('cake')}今日の誕生花<span class="today-date">${mdLabel(md)}</span></p>`
+      + `<a class="birth-more" href="#/date/${md}">すべて見る${icon('chevron')}</a></div>`
+      + miniFlowerList(list)
+      + `</section>`;
+  }
+
+  function monthPanel(month) {
+    const tab = state.monthTab === 'birth' ? 'birth' : 'bloom';
+    if (tab === 'birth') {
+      const list = monthBirthdayFlowers(month);
+      return `<p class="result-count">${month}月のいずれかの日の誕生花になっている花です（${list.length}種類）。日付は各花の詳細で見られます。</p>`
+        + cardGrid(list) + birthdayNote;
+    }
+    const list = monthBloomFlowers(month);
+    return `<p class="result-count">${month}月ごろに花が見られる花です（${list.length}種類）。開花時期は地域や品種によって前後します。</p>`
+      + cardGrid(list);
+  }
 
   function homeResults(q) {
     const list = search(q, 'all');
@@ -654,9 +901,11 @@
     return r.name === 'home' ? '#/' : `#/${r.name}${r.param ? '/' + r.param : ''}`;
   }
   function parentOf(r) {
-    if (r.param && ['feelings', 'recipients', 'scenes'].includes(r.name)) return `#/${r.name}`;
+    if (r.param && ['feelings', 'recipients', 'scenes', 'months'].includes(r.name)) return `#/${r.name}`;
+    if (r.name === 'date') { const p = parseMD(r.param); return p ? `#/calendar/${pad2(p.month)}` : '#/calendar'; }
     return '#/';
   }
+
 
   function randomFlowerId(excludeId) {
     if (FLOWERS.length < 2) return FLOWERS[0] && FLOWERS[0].id;
@@ -851,6 +1100,14 @@
         details.open = false;
         if (input) input.scrollIntoView({ block: 'start' });
       }
+      return;
+    }
+    if (t.dataset.monthTab) {
+      e.preventDefault();
+      state.monthTab = t.dataset.monthTab;
+      viewEl.querySelectorAll('[data-month-tab]').forEach((b) => b.setAttribute('aria-selected', String(b === t)));
+      const panelEl = document.getElementById('month-panel');
+      if (panelEl) panelEl.innerHTML = monthPanel(+panelEl.dataset.month);
       return;
     }
     if (t.dataset.clear) {
