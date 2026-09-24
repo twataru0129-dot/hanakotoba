@@ -7,20 +7,31 @@
  *  name          表示名
  *  kana          読み方（ひらがな）。五十音の並び替え・検索に使用
  *  emoji         シェア時に使う絵文字（省略可）
+ *  aliases       別名・漢字表記など（検索で同じ花が見つかるように。v1.1〜）
  *  meanings      代表的な花言葉
  *  colorMeanings 色別の花言葉（一般的なものがある花のみ）
  *                { color, hex, meanings, note? }
  *  categories    気持ち（categories.js の feelings の id）
  *  recipients    贈る相手（categories.js の recipients の id）
  *  scenes        シーン（categories.js の scenes の id）
- *  season        開花時期のめやす
+ *  bloomingMonths 花が見られる月の配列 [1〜12]（「月から探す」と季節表示に使用。v1.1〜）
+ *  season        開花時期のめやす（文章。省略時は bloomingMonths から自動表示）
  *  description   ひとことで表す花の紹介
  *  origin        花言葉の由来
  *  trivia        豆知識
  *  message       「今日の花」に表示する一言
  *  point         一覧で表示する、おすすめの理由
  *  look          画像がないときのイラスト設定 { shape, colors: [花びら, 花びら2, 中心] }
+ *  sources       参照元のキー（画面には表示しません）。'hananokotoba' = 花言葉-由来 https://hananokotoba.com/
  *                shape: round / daisy / star / cup / bell / cluster / layered / leaf / spike / trumpet
+ *
+ * 省略できる項目：aliases / colorMeanings / bloomingMonths / season / origin / trivia /
+ *   message / point / recipients / scenes（情報がない項目は画面に表示されません）
+ *
+ * ・色違いは別の花として登録せず、colorMeanings にまとめます（例：赤いバラ → バラの colorMeanings）。
+ * ・誕生花の日付はここには書かず、birthdays.js で管理します（花 id で参照）。
+ * ・id は一度公開したら変更しないでください（お気に入りが消えてしまいます）。
+ * ・追加・修正したら `node tools/check-data.js` で重複や参照切れを確認できます。
  *
  * ※ 花言葉には諸説あります。一般的に広く紹介されているものを掲載しています。
  */
@@ -30,6 +41,7 @@
   window.HANA_FLOWERS = [
     {
       id: 'ivy', name: 'アイビー', kana: 'あいびー', emoji: '🌿',
+      aliases: ['ヘデラ', 'セイヨウキヅタ'],
       meanings: ['永遠の愛', '友情', '誠実', '結婚'],
       categories: ['love', 'friendship', 'sincerity'],
       recipients: ['partner', 'friend', 'special'],
@@ -44,6 +56,8 @@
     },
     {
       id: 'morning-glory', name: 'アサガオ', kana: 'あさがお', emoji: '🌺',
+      aliases: ['朝顔'],
+      bloomingMonths: [7, 8, 9],
       meanings: ['愛情の絆', '結束', 'はかない恋'],
       categories: ['love', 'friendship'],
       recipients: ['partner', 'friend', 'child'],
@@ -58,6 +72,8 @@
     },
     {
       id: 'hydrangea', name: 'アジサイ', kana: 'あじさい', emoji: '💠',
+      aliases: ['紫陽花', 'ハイドランジア'],
+      bloomingMonths: [6, 7],
       meanings: ['辛抱強い愛情', '家族団らん', '移り気'],
       colorMeanings: [
         { color: '青', hex: '#8fa9e8', meanings: ['辛抱強い愛情', '知的'] },
@@ -77,6 +93,8 @@
     },
     {
       id: 'anemone', name: 'アネモネ', kana: 'あねもね', emoji: '🌸',
+      aliases: ['ボタンイチゲ', 'ハナイチゲ'],
+      bloomingMonths: [2, 3, 4, 5],
       meanings: ['はかない恋', '期待', '真実'],
       colorMeanings: [
         { color: '赤', hex: '#e2566a', meanings: ['君を愛す'] },
@@ -97,6 +115,8 @@
     },
     {
       id: 'amaryllis', name: 'アマリリス', kana: 'あまりりす', emoji: '🌺',
+      aliases: ['ヒッペアストルム'],
+      bloomingMonths: [4, 5, 6],
       meanings: ['輝くばかりの美しさ', '誇り', 'おしゃべり'],
       categories: ['respect', 'happiness'],
       recipients: ['friend', 'boss', 'special'],
@@ -111,6 +131,8 @@
     },
     {
       id: 'alstroemeria', name: 'アルストロメリア', kana: 'あるすとろめりあ', emoji: '🌷',
+      aliases: ['ユリズイセン', 'インカのユリ'],
+      bloomingMonths: [5, 6, 7],
       meanings: ['持続', '未来への憧れ', '凛々しさ', 'エキゾチック'],
       categories: ['future', 'friendship', 'hope'],
       recipients: ['friend', 'teacher', 'boss'],
@@ -125,7 +147,9 @@
     },
     {
       id: 'iris', name: 'アイリス', kana: 'あいりす', emoji: '💜',
-      meanings: ['よい便り', 'メッセージ', '希望'],
+      aliases: ['アヤメ', 'ダッチアイリス'],
+      bloomingMonths: [4, 5],
+      meanings: ['よい便り', 'メッセージ', '希望', '信じる者の幸福'],
       categories: ['hope', 'cheer'],
       recipients: ['friend', 'special'],
       scenes: ['cheer', 'entrance'],
@@ -139,6 +163,8 @@
     },
     {
       id: 'plum', name: 'ウメ', kana: 'うめ', emoji: '🌸',
+      aliases: ['梅', 'ハナウメ'],
+      bloomingMonths: [2, 3],
       meanings: ['高潔', '忍耐', '気品'],
       colorMeanings: [
         { color: '白', hex: '#f7f2ef', meanings: ['気品'] },
@@ -157,6 +183,8 @@
     },
     {
       id: 'edelweiss', name: 'エーデルワイス', kana: 'えーでるわいす', emoji: '🤍',
+      aliases: ['セイヨウウスユキソウ'],
+      bloomingMonths: [6, 7, 8, 9],
       meanings: ['大切な思い出', '勇気', '尊い記憶'],
       categories: ['comfort', 'cheer', 'respect'],
       recipients: ['friend', 'special'],
@@ -171,6 +199,8 @@
     },
     {
       id: 'carnation', name: 'カーネーション', kana: 'かーねーしょん', emoji: '💐',
+      aliases: ['オランダナデシコ', 'ジャコウナデシコ'],
+      bloomingMonths: [4, 5, 6],
       meanings: ['無垢で深い愛', '感動'],
       colorMeanings: [
         { color: '赤', hex: '#e2566a', meanings: ['母への愛', '真実の愛'] },
@@ -191,6 +221,8 @@
     },
     {
       id: 'gerbera', name: 'ガーベラ', kana: 'がーべら', emoji: '🌼',
+      aliases: ['ハナグルマ', 'アフリカセンボンヤリ'],
+      bloomingMonths: [4, 5, 9, 10],
       meanings: ['希望', '常に前進'],
       colorMeanings: [
         { color: '赤', hex: '#e2566a', meanings: ['神秘', '燃える神秘の愛'] },
@@ -212,6 +244,8 @@
     },
     {
       id: 'babys-breath', name: 'カスミソウ', kana: 'かすみそう', emoji: '🤍',
+      aliases: ['霞草', 'ジプソフィラ'],
+      bloomingMonths: [5, 6, 7],
       meanings: ['感謝', '幸福', '清らかな心', '無邪気'],
       categories: ['thanks', 'happiness', 'kindness'],
       recipients: ['family', 'friend', 'child', 'teacher', 'special'],
@@ -226,6 +260,8 @@
     },
     {
       id: 'calla', name: 'カラー', kana: 'からー', emoji: '🤍',
+      aliases: ['カラーリリー', 'オランダカイウ'],
+      bloomingMonths: [5, 6, 7],
       meanings: ['華麗なる美', '乙女のしとやかさ', '清浄'],
       categories: ['love', 'respect', 'happiness'],
       recipients: ['partner', 'special', 'boss'],
@@ -240,6 +276,8 @@
     },
     {
       id: 'kalanchoe', name: 'カランコエ', kana: 'からんこえ', emoji: '🌼',
+      aliases: ['ベニベンケイ'],
+      bloomingMonths: [1, 2, 3, 4, 5, 12],
       meanings: ['幸福を告げる', 'たくさんの小さな思い出', 'おおらかな心'],
       categories: ['happiness', 'comfort', 'kindness'],
       recipients: ['friend', 'family', 'parents'],
@@ -254,6 +292,8 @@
     },
     {
       id: 'bellflower', name: 'キキョウ', kana: 'ききょう', emoji: '💜',
+      aliases: ['桔梗'],
+      bloomingMonths: [6, 7, 8, 9],
       meanings: ['永遠の愛', '誠実', '気品'],
       categories: ['love', 'sincerity', 'respect'],
       recipients: ['partner', 'parents', 'teacher'],
@@ -268,6 +308,8 @@
     },
     {
       id: 'chrysanthemum', name: 'キク', kana: 'きく', emoji: '🏵️',
+      aliases: ['菊', 'マム', 'イエギク'],
+      bloomingMonths: [9, 10, 11],
       meanings: ['高貴', '高潔', '真の愛'],
       colorMeanings: [
         { color: '白', hex: '#f6f3ee', meanings: ['真実'] },
@@ -287,6 +329,8 @@
     },
     {
       id: 'osmanthus', name: 'キンモクセイ', kana: 'きんもくせい', emoji: '🧡',
+      aliases: ['金木犀'],
+      bloomingMonths: [9, 10],
       meanings: ['謙虚', '気高い人', '初恋', '真実'],
       categories: ['respect', 'love', 'sincerity'],
       recipients: ['teacher', 'special', 'partner'],
@@ -301,6 +345,8 @@
     },
     {
       id: 'gardenia', name: 'クチナシ', kana: 'くちなし', emoji: '🤍',
+      aliases: ['梔子'],
+      bloomingMonths: [6, 7],
       meanings: ['とても幸せです', '喜びを運ぶ', '洗練'],
       categories: ['happiness', 'love'],
       recipients: ['partner', 'special'],
@@ -315,6 +361,8 @@
     },
     {
       id: 'christmas-rose', name: 'クリスマスローズ', kana: 'くりすますろーず', emoji: '🤍',
+      aliases: ['ヘレボルス'],
+      bloomingMonths: [1, 2, 3, 12],
       meanings: ['私の不安を和らげて', 'いたわり', '追憶'],
       categories: ['comfort', 'kindness'],
       recipients: ['friend', 'family', 'special'],
@@ -329,6 +377,8 @@
     },
     {
       id: 'clematis', name: 'クレマチス', kana: 'くれまちす', emoji: '💜',
+      aliases: ['テッセン', 'カザグルマ'],
+      bloomingMonths: [4, 5, 6, 7, 8, 9, 10],
       meanings: ['精神の美', '旅人の喜び'],
       categories: ['respect', 'future'],
       recipients: ['teacher', 'friend'],
@@ -343,6 +393,8 @@
     },
     {
       id: 'crocus', name: 'クロッカス', kana: 'くろっかす', emoji: '💜',
+      aliases: ['ハナサフラン'],
+      bloomingMonths: [2, 3, 4],
       meanings: ['青春の喜び', '切望'],
       categories: ['hope', 'future'],
       recipients: ['friend', 'child'],
@@ -357,6 +409,8 @@
     },
     {
       id: 'clover', name: 'クローバー', kana: 'くろーばー', emoji: '🍀',
+      aliases: ['シロツメクサ', '白詰草', '四つ葉のクローバー'],
+      bloomingMonths: [4, 5, 6, 7],
       meanings: ['幸運', '約束', '私を思って'],
       categories: ['happiness', 'love', 'friendship'],
       recipients: ['friend', 'partner', 'child', 'special'],
@@ -371,6 +425,8 @@
     },
     {
       id: 'celosia', name: 'ケイトウ', kana: 'けいとう', emoji: '❤️',
+      aliases: ['鶏頭'],
+      bloomingMonths: [7, 8, 9, 10, 11],
       meanings: ['おしゃれ', '個性', '色あせぬ恋'],
       categories: ['love', 'cheer'],
       recipients: ['friend', 'special'],
@@ -385,6 +441,8 @@
     },
     {
       id: 'cosmos', name: 'コスモス', kana: 'こすもす', emoji: '🌸',
+      aliases: ['秋桜', 'アキザクラ'],
+      bloomingMonths: [9, 10],
       meanings: ['乙女の真心', '調和', '謙虚'],
       colorMeanings: [
         { color: 'ピンク', hex: '#f5a6bf', meanings: ['乙女の純潔'] },
@@ -405,6 +463,8 @@
     },
     {
       id: 'moth-orchid', name: 'コチョウラン', kana: 'こちょうらん', emoji: '🦋',
+      aliases: ['胡蝶蘭', 'ファレノプシス'],
+      bloomingMonths: [3, 4, 5],
       meanings: ['幸福が飛んでくる', '純粋な愛'],
       categories: ['happiness', 'respect', 'love'],
       recipients: ['boss', 'parents', 'special'],
@@ -419,6 +479,8 @@
     },
     {
       id: 'sasanqua', name: 'サザンカ', kana: 'さざんか', emoji: '🌺',
+      aliases: ['山茶花'],
+      bloomingMonths: [10, 11, 12],
       meanings: ['困難に打ち克つ', 'ひたむきさ'],
       colorMeanings: [
         { color: '赤', hex: '#e2566a', meanings: ['謙譲'] },
@@ -438,6 +500,8 @@
     },
     {
       id: 'cherry-blossom', name: 'サクラ', kana: 'さくら', emoji: '🌸',
+      aliases: ['桜', 'ソメイヨシノ'],
+      bloomingMonths: [3, 4],
       meanings: ['精神の美', '優美な女性', '純潔'],
       categories: ['future', 'hope', 'respect'],
       recipients: ['teacher', 'friend', 'child'],
@@ -452,6 +516,8 @@
     },
     {
       id: 'saffron', name: 'サフラン', kana: 'さふらん', emoji: '💜',
+      aliases: ['サフランクロッカス'],
+      bloomingMonths: [10, 11],
       meanings: ['歓喜', '陽気', '節度の美'],
       categories: ['happiness', 'health'],
       recipients: ['friend', 'family'],
@@ -466,6 +532,8 @@
     },
     {
       id: 'peony', name: 'シャクヤク', kana: 'しゃくやく', emoji: '🌸',
+      aliases: ['芍薬'],
+      bloomingMonths: [5, 6],
       meanings: ['はにかみ', '誠実', '幸せな結婚'],
       categories: ['love', 'happiness', 'sincerity'],
       recipients: ['partner', 'special', 'parents'],
@@ -480,6 +548,8 @@
     },
     {
       id: 'aster', name: 'シオン', kana: 'しおん', emoji: '💜',
+      aliases: ['紫苑'],
+      bloomingMonths: [9, 10],
       meanings: ['君を忘れない', '追憶', '遠方にある人を思う'],
       categories: ['comfort', 'friendship'],
       recipients: ['friend', 'special'],
@@ -494,6 +564,8 @@
     },
     {
       id: 'daphne', name: 'ジンチョウゲ', kana: 'じんちょうげ', emoji: '🌸',
+      aliases: ['沈丁花'],
+      bloomingMonths: [2, 3, 4],
       meanings: ['栄光', '不滅', '永遠'],
       categories: ['respect', 'health', 'future'],
       recipients: ['teacher', 'boss', 'parents'],
@@ -508,6 +580,8 @@
     },
     {
       id: 'sweet-pea', name: 'スイートピー', kana: 'すいーとぴー', emoji: '🦋',
+      aliases: ['ジャコウエンドウ'],
+      bloomingMonths: [1, 2, 3, 4, 12],
       meanings: ['門出', '優しい思い出', 'ほのかな喜び'],
       categories: ['future', 'comfort', 'kindness'],
       recipients: ['friend', 'teacher', 'boss'],
@@ -522,6 +596,8 @@
     },
     {
       id: 'lily-of-the-valley', name: 'スズラン', kana: 'すずらん', emoji: '🔔',
+      aliases: ['鈴蘭', 'キミカゲソウ'],
+      bloomingMonths: [4, 5, 6],
       meanings: ['再び幸せが訪れる', '純粋', '謙遜'],
       categories: ['happiness', 'hope', 'kindness'],
       recipients: ['family', 'friend', 'special'],
@@ -536,6 +612,8 @@
     },
     {
       id: 'snowdrop', name: 'スノードロップ', kana: 'すのーどろっぷ', emoji: '🤍',
+      aliases: ['待雪草', 'マツユキソウ'],
+      bloomingMonths: [2, 3],
       meanings: ['希望', '慰め'],
       categories: ['hope', 'comfort'],
       recipients: ['friend', 'special'],
@@ -550,6 +628,8 @@
     },
     {
       id: 'violet', name: 'スミレ', kana: 'すみれ', emoji: '💜',
+      aliases: ['菫'],
+      bloomingMonths: [3, 4, 5],
       meanings: ['謙虚', '誠実', '小さな幸せ'],
       colorMeanings: [
         { color: '紫', hex: '#8c6ad6', meanings: ['貞節', '愛'] },
@@ -569,6 +649,8 @@
     },
     {
       id: 'statice', name: 'スターチス', kana: 'すたーちす', emoji: '💜',
+      aliases: ['リモニウム', 'ハナハマサジ'],
+      bloomingMonths: [4, 5, 6],
       meanings: ['変わらぬ心', '途絶えぬ記憶'],
       categories: ['sincerity', 'friendship', 'comfort'],
       recipients: ['friend', 'family', 'teacher'],
@@ -583,6 +665,8 @@
     },
     {
       id: 'globe-amaranth', name: 'センニチコウ', kana: 'せんにちこう', emoji: '🔴',
+      aliases: ['千日紅', 'ゴンフレナ'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10, 11],
       meanings: ['色あせぬ愛', '変わらぬ愛情', '不朽'],
       categories: ['love', 'health', 'sincerity'],
       recipients: ['parents', 'partner', 'family'],
@@ -597,6 +681,8 @@
     },
     {
       id: 'dahlia', name: 'ダリア', kana: 'だりあ', emoji: '🌺',
+      aliases: ['テンジクボタン', '天竺牡丹'],
+      bloomingMonths: [6, 7, 8, 9, 10, 11],
       meanings: ['華麗', '優雅', '感謝'],
       categories: ['thanks', 'respect', 'happiness'],
       recipients: ['boss', 'teacher', 'parents', 'special'],
@@ -611,6 +697,8 @@
     },
     {
       id: 'dandelion', name: 'タンポポ', kana: 'たんぽぽ', emoji: '🌼',
+      aliases: ['蒲公英'],
+      bloomingMonths: [3, 4, 5],
       meanings: ['真心の愛', '幸せ', '神託'],
       categories: ['love', 'happiness', 'hope'],
       recipients: ['child', 'friend', 'family'],
@@ -625,6 +713,8 @@
     },
     {
       id: 'tulip', name: 'チューリップ', kana: 'ちゅーりっぷ', emoji: '🌷',
+      aliases: ['鬱金香'],
+      bloomingMonths: [3, 4, 5],
       meanings: ['思いやり'],
       colorMeanings: [
         { color: '赤', hex: '#e2566a', meanings: ['愛の告白', '真実の愛'] },
@@ -647,6 +737,8 @@
     },
     {
       id: 'camellia', name: 'ツバキ', kana: 'つばき', emoji: '🌺',
+      aliases: ['椿'],
+      bloomingMonths: [1, 2, 3, 4, 12],
       meanings: ['控えめな優しさ', '誇り'],
       colorMeanings: [
         { color: '赤', hex: '#d8425d', meanings: ['控えめな素晴らしさ', '気取らない優美さ'] },
@@ -666,6 +758,8 @@
     },
     {
       id: 'daisy', name: 'デイジー', kana: 'でいじー', emoji: '🌼',
+      aliases: ['ヒナギク', '雛菊', 'ベリス'],
+      bloomingMonths: [3, 4, 5],
       meanings: ['平和', '希望', '純潔', '美人'],
       categories: ['hope', 'kindness', 'happiness'],
       recipients: ['child', 'friend', 'family'],
@@ -680,6 +774,8 @@
     },
     {
       id: 'lisianthus', name: 'トルコキキョウ', kana: 'とるこききょう', emoji: '💜',
+      aliases: ['ユーストマ'],
+      bloomingMonths: [6, 7, 8, 9],
       meanings: ['優美', 'すがすがしい美しさ', '希望'],
       colorMeanings: [
         { color: '紫', hex: '#9a78dc', meanings: ['希望'] },
@@ -699,6 +795,8 @@
     },
     {
       id: 'dianthus', name: 'ナデシコ', kana: 'なでしこ', emoji: '🌸',
+      aliases: ['撫子', 'カワラナデシコ'],
+      bloomingMonths: [5, 6, 7, 8],
       meanings: ['純愛', '無邪気', '大胆'],
       categories: ['love', 'kindness'],
       recipients: ['partner', 'child', 'special'],
@@ -713,6 +811,8 @@
     },
     {
       id: 'rape-blossom', name: 'ナノハナ', kana: 'なのはな', emoji: '🌼',
+      aliases: ['菜の花', 'アブラナ'],
+      bloomingMonths: [2, 3, 4],
       meanings: ['快活な愛', '小さな幸せ', '競争'],
       categories: ['happiness', 'cheer', 'hope'],
       recipients: ['friend', 'child', 'family'],
@@ -727,6 +827,8 @@
     },
     {
       id: 'nemophila', name: 'ネモフィラ', kana: 'ねもふぃら', emoji: '💙',
+      aliases: ['ルリカラクサ'],
+      bloomingMonths: [4, 5],
       meanings: ['どこでも成功', '可憐', 'あなたを許す'],
       categories: ['cheer', 'future', 'kindness'],
       recipients: ['friend', 'child'],
@@ -741,6 +843,8 @@
     },
     {
       id: 'hibiscus', name: 'ハイビスカス', kana: 'はいびすかす', emoji: '🌺',
+      aliases: ['ブッソウゲ'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
       meanings: ['繊細な美', '新しい恋', '勇敢'],
       categories: ['love', 'cheer'],
       recipients: ['partner', 'friend'],
@@ -755,6 +859,8 @@
     },
     {
       id: 'dogwood', name: 'ハナミズキ', kana: 'はなみずき', emoji: '🌸',
+      aliases: ['花水木', 'アメリカヤマボウシ'],
+      bloomingMonths: [4, 5],
       meanings: ['返礼', '私の想いを受けてください', '永続性'],
       categories: ['thanks', 'love', 'friendship'],
       recipients: ['partner', 'friend', 'special'],
@@ -769,6 +875,8 @@
     },
     {
       id: 'ornamental-cabbage', name: 'ハボタン', kana: 'はぼたん', emoji: '🥬',
+      aliases: ['葉牡丹'],
+      bloomingMonths: [1, 2, 3, 11, 12],
       meanings: ['祝福', '慈愛', '利益'],
       categories: ['happiness', 'kindness'],
       recipients: ['family', 'parents'],
@@ -783,6 +891,8 @@
     },
     {
       id: 'rose', name: 'バラ', kana: 'ばら', emoji: '🌹',
+      aliases: ['薔薇', 'ローズ', 'ミニバラ'],
+      bloomingMonths: [5, 6, 10, 11],
       meanings: ['愛', '美'],
       colorMeanings: [
         { color: '赤', hex: '#d8425d', meanings: ['あなたを愛しています', '愛情', '情熱'] },
@@ -805,6 +915,8 @@
     },
     {
       id: 'pansy', name: 'パンジー', kana: 'ぱんじー', emoji: '💜',
+      aliases: ['サンシキスミレ'],
+      bloomingMonths: [1, 2, 3, 4, 5, 10, 11, 12],
       meanings: ['もの思い', '私を思って'],
       colorMeanings: [
         { color: '紫', hex: '#8c6ad6', meanings: ['思慮深い'] },
@@ -824,6 +936,8 @@
     },
     {
       id: 'red-spider-lily', name: 'ヒガンバナ', kana: 'ひがんばな', emoji: '🌺',
+      aliases: ['彼岸花', '曼珠沙華', 'リコリス'],
+      bloomingMonths: [9],
       meanings: ['情熱', '再会', 'また会う日を楽しみに'],
       categories: ['comfort', 'love'],
       recipients: [],
@@ -838,6 +952,8 @@
     },
     {
       id: 'hyacinth', name: 'ヒヤシンス', kana: 'ひやしんす', emoji: '💜',
+      aliases: ['ヒアシンス', '風信子'],
+      bloomingMonths: [3, 4],
       meanings: ['スポーツ', 'ゲーム', '悲哀'],
       colorMeanings: [
         { color: '青', hex: '#8fa9e8', meanings: ['変わらぬ愛'] },
@@ -858,6 +974,8 @@
     },
     {
       id: 'sunflower', name: 'ひまわり', kana: 'ひまわり', emoji: '🌻',
+      aliases: ['向日葵', 'サンフラワー'],
+      bloomingMonths: [7, 8, 9],
       meanings: ['あなただけを見つめる', '憧れ', 'あなたは素晴らしい'],
       categories: ['love', 'respect', 'cheer', 'happiness'],
       recipients: ['partner', 'parents', 'friend', 'child', 'special'],
@@ -872,6 +990,8 @@
     },
     {
       id: 'viola', name: 'ビオラ', kana: 'びおら', emoji: '💜',
+      aliases: [],
+      bloomingMonths: [1, 2, 3, 4, 5, 10, 11, 12],
       meanings: ['誠実な愛', '信頼', '少女の恋'],
       categories: ['love', 'sincerity', 'friendship'],
       recipients: ['partner', 'friend', 'child'],
@@ -886,6 +1006,8 @@
     },
     {
       id: 'wisteria', name: 'フジ', kana: 'ふじ', emoji: '💜',
+      aliases: ['藤'],
+      bloomingMonths: [4, 5],
       meanings: ['優しさ', '歓迎', '決して離れない'],
       categories: ['kindness', 'love', 'friendship'],
       recipients: ['partner', 'family', 'friend'],
@@ -900,6 +1022,8 @@
     },
     {
       id: 'freesia', name: 'フリージア', kana: 'ふりーじあ', emoji: '💛',
+      aliases: ['アサギズイセン'],
+      bloomingMonths: [3, 4],
       meanings: ['あどけなさ', '親愛の情'],
       colorMeanings: [
         { color: '黄', hex: '#f3d56b', meanings: ['無邪気'] },
@@ -921,6 +1045,8 @@
     },
     {
       id: 'blue-star', name: 'ブルースター', kana: 'ぶるーすたー', emoji: '💙',
+      aliases: ['オキシペタラム', 'ルリトウワタ'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
       meanings: ['信じあう心', '幸福な愛'],
       categories: ['love', 'happiness', 'sincerity'],
       recipients: ['partner', 'child', 'special'],
@@ -935,6 +1061,8 @@
     },
     {
       id: 'tree-peony', name: 'ボタン', kana: 'ぼたん', emoji: '🌸',
+      aliases: ['牡丹'],
+      bloomingMonths: [4, 5],
       meanings: ['風格', '富貴', '王者の風格'],
       categories: ['respect', 'happiness', 'health'],
       recipients: ['parents', 'boss', 'teacher'],
@@ -949,6 +1077,8 @@
     },
     {
       id: 'poinsettia', name: 'ポインセチア', kana: 'ぽいんせちあ', emoji: '🎄',
+      aliases: ['ショウジョウボク'],
+      bloomingMonths: [11, 12],
       meanings: ['祝福する', '聖夜', '私の心は燃えている'],
       categories: ['happiness', 'love'],
       recipients: ['family', 'partner', 'friend'],
@@ -963,6 +1093,8 @@
     },
     {
       id: 'poppy', name: 'ポピー', kana: 'ぽぴー', emoji: '🌺',
+      aliases: ['ヒナゲシ', '虞美人草'],
+      bloomingMonths: [4, 5, 6],
       meanings: ['いたわり', '思いやり', '恋の予感'],
       categories: ['kindness', 'comfort', 'love'],
       recipients: ['friend', 'family', 'special'],
@@ -977,6 +1109,8 @@
     },
     {
       id: 'marguerite', name: 'マーガレット', kana: 'まーがれっと', emoji: '🌼',
+      aliases: ['モクシュンギク'],
+      bloomingMonths: [3, 4, 5, 6],
       meanings: ['恋占い', '真実の愛', '信頼'],
       categories: ['love', 'friendship', 'sincerity'],
       recipients: ['partner', 'friend', 'special'],
@@ -991,6 +1125,8 @@
     },
     {
       id: 'marigold', name: 'マリーゴールド', kana: 'まりーごーるど', emoji: '🧡',
+      aliases: ['アフリカンマリーゴールド', 'フレンチマリーゴールド'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10, 11],
       meanings: ['変わらぬ愛', '勇者', '嫉妬'],
       categories: ['cheer', 'love'],
       recipients: ['friend', 'family'],
@@ -1005,6 +1141,8 @@
     },
     {
       id: 'mimosa', name: 'ミモザ', kana: 'みもざ', emoji: '💛',
+      aliases: ['ギンヨウアカシア', 'アカシア'],
+      bloomingMonths: [2, 3, 4],
       meanings: ['感謝', '友情', '優雅', '秘密の恋'],
       categories: ['thanks', 'friendship', 'happiness'],
       recipients: ['friend', 'family', 'parents', 'boss', 'teacher'],
@@ -1019,6 +1157,8 @@
     },
     {
       id: 'muscari', name: 'ムスカリ', kana: 'むすかり', emoji: '💙',
+      aliases: ['グレープヒヤシンス'],
+      bloomingMonths: [3, 4],
       meanings: ['通じ合う心', '明るい未来'],
       categories: ['future', 'friendship', 'hope'],
       recipients: ['friend', 'partner', 'child'],
@@ -1033,6 +1173,8 @@
     },
     {
       id: 'lily', name: 'ユリ', kana: 'ゆり', emoji: '🤍',
+      aliases: ['百合'],
+      bloomingMonths: [6, 7, 8],
       meanings: ['純粋', '威厳', '無垢'],
       colorMeanings: [
         { color: '白', hex: '#f6f3ee', meanings: ['純潔', '威厳'] },
@@ -1052,6 +1194,8 @@
     },
     {
       id: 'lilac', name: 'ライラック', kana: 'らいらっく', emoji: '💜',
+      aliases: ['リラ', 'ムラサキハシドイ'],
+      bloomingMonths: [4, 5],
       meanings: ['思い出', '友情', '初恋'],
       colorMeanings: [
         { color: '紫', hex: '#9a78dc', meanings: ['初恋', '恋の芽生え'] },
@@ -1070,6 +1214,8 @@
     },
     {
       id: 'lavender', name: 'ラベンダー', kana: 'らべんだー', emoji: '💜',
+      aliases: [],
+      bloomingMonths: [6, 7, 8],
       meanings: ['あなたを待っています', '期待', '清潔', '沈黙'],
       categories: ['hope', 'comfort', 'love'],
       recipients: ['partner', 'friend', 'special'],
@@ -1084,6 +1230,8 @@
     },
     {
       id: 'gentian', name: 'リンドウ', kana: 'りんどう', emoji: '💙',
+      aliases: ['竜胆'],
+      bloomingMonths: [9, 10, 11],
       meanings: ['誠実', '正義', '悲しんでいるあなたを愛する'],
       categories: ['sincerity', 'health', 'respect', 'comfort'],
       recipients: ['parents', 'teacher', 'family'],
@@ -1098,6 +1246,8 @@
     },
     {
       id: 'forget-me-not', name: 'ワスレナグサ', kana: 'わすれなぐさ', emoji: '💙',
+      aliases: ['勿忘草', 'ミオソティス'],
+      bloomingMonths: [3, 4, 5],
       meanings: ['私を忘れないで', '真実の友情', '誠の愛'],
       categories: ['friendship', 'love', 'comfort'],
       recipients: ['friend', 'partner', 'special'],
@@ -1109,6 +1259,3092 @@
       message: '遠く離れても、この気持ちは色あせません。',
       point: '「私を忘れないで」。卒業や送別に。',
       look: { shape: 'round', colors: ['#a7cdf2', '#6ea6e0', '#f5d55c'] }
+    },
+
+    /* ===== v1.1 追加（誕生花に登場する花を中心に登録） ===== */
+    {
+      id: 'fukujuso', name: 'フクジュソウ', kana: 'ふくじゅそう', emoji: '🌼',
+      aliases: ['福寿草', '元日草'],
+      meanings: ['幸せを招く', '永久の幸福', '悲しき思い出'],
+      bloomingMonths: [2, 3, 4],
+      categories: ['happiness'],
+      description: '早春、雪の残る地面から黄金色の花を開く縁起のよい花です。',
+      trivia: '旧暦の正月ごろに咲くことから「元日草」とも呼ばれ、お正月の寄せ植えにも使われます。',
+      look: { shape: 'daisy', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'robai', name: 'ロウバイ', kana: 'ろうばい', emoji: '🌼',
+      aliases: ['蝋梅', '唐梅'],
+      meanings: ['ゆかしさ', '慈愛', '先見'],
+      bloomingMonths: [1, 2],
+      categories: ['love', 'kindness'],
+      description: '真冬に、蝋細工のような透き通る黄色い花を咲かせる花木です。',
+      trivia: '花びらが蝋のようなつやをもち、梅と同じころに咲くことが名前の由来とされます。',
+      look: { shape: 'round', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'take', name: 'タケ', kana: 'たけ', emoji: '🌿',
+      aliases: ['竹'],
+      meanings: ['節度', '節操のある', '変わらない'],
+      categories: [],
+      description: 'まっすぐ伸びる幹と、青々とした葉が清々しい植物です。',
+      trivia: '竹の花は数十年から百年以上に一度しか咲かないといわれる、珍しいものです。',
+      look: { shape: 'leaf', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'matsu', name: 'マツ', kana: 'まつ', emoji: '🌿',
+      aliases: ['松'],
+      meanings: ['不老長寿', '哀れみ', '勇敢'],
+      bloomingMonths: [4, 5],
+      categories: ['health', 'cheer'],
+      description: '一年中緑を保つことから、長寿の象徴とされてきた常緑樹です。',
+      trivia: 'お正月の門松に使われるなど、古くからおめでたい木として親しまれています。',
+      look: { shape: 'leaf', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'misumiso', name: 'ミスミソウ', kana: 'みすみそう', emoji: '💜',
+      aliases: ['雪割草', 'ユキワリソウ', '三角草'],
+      meanings: ['自信', 'はにかみ屋', '信頼'],
+      bloomingMonths: [2, 3, 4],
+      categories: ['sincerity'],
+      description: '雪どけのころ、小さく可憐な花を咲かせる山野草です。',
+      trivia: '雪を割るように早春に咲くことから「雪割草」とも呼ばれます。',
+      look: { shape: 'star', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'mansaku', name: 'マンサク', kana: 'まんさく', emoji: '🌼',
+      aliases: ['満作', '金縷梅'],
+      meanings: ['呪文', 'ひらめき', '霊感'],
+      bloomingMonths: [2, 3],
+      categories: [],
+      description: 'リボンのような細い花びらを広げる、早春の花木です。',
+      trivia: '春に「まず咲く」ことが名前の由来という説があります。',
+      look: { shape: 'star', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'seri', name: 'セリ', kana: 'せり', emoji: '🤍',
+      aliases: ['芹'],
+      meanings: ['清廉で高潔', '貧しくても高潔'],
+      bloomingMonths: [7, 8],
+      categories: ['respect', 'sincerity'],
+      description: '水辺に育ち、さわやかな香りをもつ身近な植物です。',
+      trivia: '春の七草のひとつで、競り合うように生えることが名前の由来とされます。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'benjamin', name: 'ベンジャミン', kana: 'べんじゃみん', emoji: '🌿',
+      aliases: ['ベンジャミンゴム', 'シダレガジュマル'],
+      meanings: ['信頼', '友情', '融通のきく'],
+      categories: ['sincerity', 'friendship'],
+      description: '小さなつやのある葉が茂る、人気の観葉植物です。',
+      look: { shape: 'leaf', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'mokuren', name: 'モクレン', kana: 'もくれん', emoji: '🌺',
+      aliases: ['木蓮', 'シモクレン', 'マグノリア'],
+      meanings: ['崇高', '自然への愛', '持続性'],
+      bloomingMonths: [3, 4],
+      categories: ['respect', 'love'],
+      description: '春、枝先に大きな花を上向きに咲かせる花木です。',
+      trivia: 'つぼみの先がそろって北を向くことから「コンパスフラワー」とも呼ばれます。',
+      look: { shape: 'cup', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'northpole', name: 'ノースポール', kana: 'のーすぽーる', emoji: '🤍',
+      aliases: ['クリサンセマム・パルドサム'],
+      meanings: ['誠実', '高潔'],
+      bloomingMonths: [1, 2, 3, 4, 5, 6, 12],
+      categories: ['sincerity', 'respect'],
+      description: '白い花びらと黄色い中心がかわいらしい、冬から春の花です。',
+      look: { shape: 'daisy', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'stock', name: 'ストック', kana: 'すとっく', emoji: '🌸',
+      aliases: ['アラセイトウ'],
+      meanings: ['永遠の美', '愛の絆', '豊かな愛'],
+      colorMeanings: [{ color: '赤', hex: '#e2566a', meanings: ['私を信じて'] }, { color: 'ピンク', hex: '#f5a6bf', meanings: ['豊かな愛'] }, { color: '白', hex: '#f6f3ee', meanings: ['ひそやかな愛'] }, { color: '紫', hex: '#9a78dc', meanings: ['おおらかな愛情'] }],
+      bloomingMonths: [1, 2, 3, 4],
+      categories: ['love'],
+      description: '甘い香りの花がふんわりと穂のように咲く花です。',
+      look: { shape: 'layered', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'alyssum', name: 'スイートアリッサム', kana: 'すいーとありっさむ', emoji: '🤍',
+      aliases: ['アリッサム', 'ニワナズナ'],
+      meanings: ['優美', '美しさを超えた価値'],
+      bloomingMonths: [3, 4, 5, 6, 9, 10, 11, 12],
+      categories: [],
+      description: '甘い香りの小花がカーペットのように広がる花です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'cattleya', name: 'カトレア', kana: 'かとれあ', emoji: '🌺',
+      aliases: [],
+      meanings: ['優美な貴婦人', '成熟した大人の魅力', '魔力'],
+      bloomingMonths: [1, 10, 11, 12],
+      categories: [],
+      description: '大きく華やかな花を咲かせる、洋ランの代表です。',
+      trivia: '豪華な花姿から「洋ランの女王」と呼ばれます。',
+      look: { shape: 'star', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'cyclamen', name: 'シクラメン', kana: 'しくらめん', emoji: '🌸',
+      aliases: ['篝火花', 'カガリビバナ'],
+      meanings: ['遠慮', '気後れ', 'はにかみ'],
+      colorMeanings: [{ color: '赤', hex: '#e2566a', meanings: ['嫉妬'] }, { color: '白', hex: '#f6f3ee', meanings: ['清純'] }, { color: 'ピンク', hex: '#f5a6bf', meanings: ['憧れ', '内気'] }],
+      bloomingMonths: [1, 2, 3, 10, 11, 12],
+      categories: [],
+      description: '反り返る花びらが炎のように見える、冬の鉢花の代表です。',
+      trivia: '和名の「篝火花」は、花姿がかがり火に見えることから名づけられました。',
+      look: { shape: 'star', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'cymbidium', name: 'シンビジウム', kana: 'しんびじうむ', emoji: '🤍',
+      aliases: ['シンビジューム'],
+      meanings: ['飾らない心', '素朴', '高貴な美人'],
+      bloomingMonths: [1, 2, 3, 12],
+      categories: ['respect'],
+      description: '長持ちする花が連なって咲く、冬の贈り物に人気のランです。',
+      look: { shape: 'star', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'oncidium', name: 'オンシジューム', kana: 'おんしじゅーむ', emoji: '🌼',
+      aliases: ['オンシジウム', '群雀蘭'],
+      meanings: ['一緒に踊って', '可憐'],
+      bloomingMonths: [10, 11, 12],
+      categories: [],
+      description: '黄色い小花が群れて揺れる、軽やかなランです。',
+      trivia: '花の形がドレスで踊る女性に見えることから「ダンシングレディ」とも呼ばれます。',
+      look: { shape: 'cluster', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'dendrobium', name: 'デンドロビウム', kana: 'でんどろびうむ', emoji: '💜',
+      aliases: ['デンドロビューム'],
+      meanings: ['わがままな美人', '天性の華をもつ'],
+      bloomingMonths: [2, 3, 4, 5],
+      categories: [],
+      description: '節のある茎に花が連なって咲く、華やかなランです。',
+      look: { shape: 'star', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'snapdragon', name: 'キンギョソウ', kana: 'きんぎょそう', emoji: '🌸',
+      aliases: ['金魚草', 'スナップドラゴン'],
+      meanings: ['おしゃべり', 'おせっかい', '清純な心'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['sincerity'],
+      description: '金魚のような形の花が穂になって咲く花です。',
+      trivia: '花を横からつまむと、金魚が口を開けたように見えます。',
+      look: { shape: 'spike', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'primula', name: 'プリムラ', kana: 'ぷりむら', emoji: '🌷',
+      aliases: ['プリムローズ', 'セイヨウサクラソウ'],
+      meanings: ['青春のはじまりと悲しみ', '青春の恋', '運命を開く'],
+      bloomingMonths: [1, 2, 3, 4, 12],
+      categories: ['love'],
+      description: '冬から春の花壇を明るく彩る、色とりどりの花です。',
+      look: { shape: 'round', colors: ['#fbb3a0', '#ef7f6c', '#f7d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'sanshuyu', name: 'サンシュユ', kana: 'さんしゅゆ', emoji: '🌼',
+      aliases: ['山茱萸', 'ハルコガネバナ'],
+      meanings: ['持続', '耐久', '気丈な愛'],
+      bloomingMonths: [3, 4],
+      categories: ['love'],
+      description: '葉が出る前に、枝いっぱいに黄色い小花を咲かせる花木です。',
+      trivia: '秋には赤い実がなり「アキサンゴ」とも呼ばれます。',
+      look: { shape: 'cluster', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'calendula', name: 'キンセンカ', kana: 'きんせんか', emoji: '🧡',
+      aliases: ['金盞花', 'カレンデュラ', 'ポットマリーゴールド'],
+      meanings: ['別れの悲しみ', '慈愛', '乙女の美しい姿'],
+      bloomingMonths: [1, 2, 3, 4, 5, 12],
+      categories: ['love', 'kindness'],
+      description: '明るいオレンジ色の花が長く咲く、冬から春の花です。',
+      look: { shape: 'daisy', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ranunculus', name: 'ラナンキュラス', kana: 'らなんきゅらす', emoji: '🌷',
+      aliases: ['ハナキンポウゲ'],
+      meanings: ['晴れやかな魅力', 'とても魅力的', '光輝を放つ'],
+      colorMeanings: [{ color: '赤', hex: '#e2566a', meanings: ['あなたは魅力に満ちている'] }, { color: 'ピンク', hex: '#f5a6bf', meanings: ['飾らない美しさ'] }, { color: '白', hex: '#f6f3ee', meanings: ['純潔'] }, { color: '黄', hex: '#f3d56b', meanings: ['優しい心遣い'] }],
+      bloomingMonths: [3, 4, 5],
+      categories: [],
+      description: '薄い花びらが幾重にも重なる、華やかな春の球根植物です。',
+      look: { shape: 'layered', colors: ['#fbb3a0', '#ef7f6c', '#f7d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'anthurium', name: 'アンスリウム', kana: 'あんすりうむ', emoji: '🌺',
+      aliases: ['アンスリューム', 'オオベニウチワ'],
+      meanings: ['情熱', '煩悩', '恋にもだえる心'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['love'],
+      description: 'ハート形のつややかな苞が印象的な、南国の花です。',
+      trivia: '赤く見える部分は花ではなく、仏炎苞と呼ばれる葉の一種です。',
+      look: { shape: 'cup', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'guzmania', name: 'グズマニア', kana: 'ぐずまにあ', emoji: '🌺',
+      aliases: [],
+      meanings: ['理想の夫婦', '情熱', 'あなたは完璧'],
+      bloomingMonths: [5, 6, 7, 8, 9],
+      categories: [],
+      description: '鮮やかな苞が長く色を保つ、パイナップルの仲間です。',
+      look: { shape: 'spike', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'winter-jasmine', name: 'オウバイ', kana: 'おうばい', emoji: '🌼',
+      aliases: ['黄梅', '迎春花'],
+      meanings: ['恩恵', '控えめな美', '期待'],
+      bloomingMonths: [2, 3, 4],
+      categories: ['hope'],
+      description: '梅のころに黄色い花を咲かせる、ジャスミンの仲間です。',
+      look: { shape: 'star', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'snowflake', name: 'スノーフレーク', kana: 'すのーふれーく', emoji: '🤍',
+      aliases: ['スズランズイセン', '鈴蘭水仙'],
+      meanings: ['純粋', '純潔', '皆をひきつける魅力'],
+      bloomingMonths: [3, 4],
+      categories: ['sincerity'],
+      description: 'スズランに似た白い花の先に、緑の点がある球根植物です。',
+      look: { shape: 'bell', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'sensitive-plant', name: 'オジギソウ', kana: 'おじぎそう', emoji: '🌸',
+      aliases: ['含羞草', 'ネムリグサ'],
+      meanings: ['感じやすい心', '繊細な感情', '謙虚'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: 'ふわふわのピンクの花と、触ると閉じる葉が不思議な植物です。',
+      trivia: '葉に触れるとお辞儀をするように閉じて垂れ下がることが名前の由来です。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'katakuri', name: 'カタクリ', kana: 'かたくり', emoji: '🌺',
+      aliases: ['片栗'],
+      meanings: ['初恋', '寂しさに耐える'],
+      bloomingMonths: [3, 4],
+      categories: ['love'],
+      description: '早春の林にうつむいて咲く、スプリング・エフェメラルの代表です。',
+      trivia: '昔は球根から「片栗粉」がとられていました。',
+      look: { shape: 'star', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'gazania', name: 'ガザニア', kana: 'がざにあ', emoji: '🧡',
+      aliases: ['クンショウギク', '勲章菊'],
+      meanings: ['潜在的な美しさ', 'あなたを誇りに思う', 'きらびやか'],
+      bloomingMonths: [4, 5, 6, 7, 8, 9, 10],
+      categories: [],
+      description: '日が当たると勲章のような模様の花を開く花です。',
+      look: { shape: 'daisy', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'okinagusa', name: 'オキナグサ', kana: 'おきなぐさ', emoji: '❤️',
+      aliases: ['翁草'],
+      meanings: ['何も求めない', '告げられぬ恋', '清純な心'],
+      bloomingMonths: [4, 5],
+      categories: ['love', 'sincerity'],
+      description: 'うつむいて咲く花と、白い綿毛が印象的な山野草です。',
+      trivia: '花後の白い綿毛を、翁（おじいさん）の白髪に見立てた名前です。',
+      look: { shape: 'cup', colors: ['#c77a88', '#8e3a52', '#e8c36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'japanese-primrose', name: 'サクラソウ', kana: 'さくらそう', emoji: '🌸',
+      aliases: ['桜草'],
+      meanings: ['初恋', '希望', '憧れ'],
+      bloomingMonths: [4, 5],
+      categories: ['love', 'hope'],
+      description: '桜に似た小さな花を咲かせる、日本の春の山野草です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'boke', name: 'ボケ', kana: 'ぼけ', emoji: '🌷',
+      aliases: ['木瓜'],
+      meanings: ['先駆者', '指導者', '平凡'],
+      bloomingMonths: [3, 4],
+      categories: [],
+      description: '春先に丸みのある花を枝いっぱいに咲かせる花木です。',
+      look: { shape: 'round', colors: ['#fbb3a0', '#ef7f6c', '#f7d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yukinoshita', name: 'ユキノシタ', kana: 'ゆきのした', emoji: '🤍',
+      aliases: ['雪の下'],
+      meanings: ['切実な愛情', '好感', '深い愛情'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['love'],
+      description: '大小の花びらが「大」の字のように見える、日陰の植物です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hotokenoza', name: 'ホトケノザ', kana: 'ほとけのざ', emoji: '🌺',
+      aliases: ['仏の座', 'サンガイグサ'],
+      meanings: ['調和', '輝く心'],
+      bloomingMonths: [3, 4, 5],
+      categories: [],
+      description: '道ばたで見かける、赤紫色の小さな花です。',
+      trivia: '春の七草の「ほとけのざ」は、キク科のコオニタビラコという別の植物です。',
+      look: { shape: 'spike', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'bergenia', name: 'ヒマラヤユキノシタ', kana: 'ひまらやゆきのした', emoji: '🌸',
+      aliases: ['ベルゲニア'],
+      meanings: ['秘めた感情', '順応'],
+      bloomingMonths: [2, 3, 4],
+      categories: [],
+      description: '丸く大きな葉とピンクの花房をもつ、丈夫な植物です。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'forsythia', name: 'レンギョウ', kana: 'れんぎょう', emoji: '🌼',
+      aliases: ['連翹'],
+      meanings: ['希望', '集中力', '期待'],
+      bloomingMonths: [3, 4],
+      categories: ['hope'],
+      description: '春、枝いっぱいに黄色い花を咲かせる花木です。',
+      look: { shape: 'star', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'chamomile', name: 'カモミール', kana: 'かもみーる', emoji: '🤍',
+      aliases: ['カミツレ', 'カモマイル', 'ジャーマンカモミール'],
+      meanings: ['逆境で生まれる力', '苦難の中の力', '親交'],
+      bloomingMonths: [4, 5, 6],
+      categories: [],
+      description: 'りんごのような甘い香りがする、ハーブティーでおなじみの花です。',
+      trivia: '踏まれても元気に育つといわれることが、花言葉の由来とされます。',
+      look: { shape: 'daisy', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'cineraria', name: 'シネラリア', kana: 'しねらりあ', emoji: '💙',
+      aliases: ['サイネリア', 'フキザクラ'],
+      meanings: ['いつも快活', '喜び', '常に輝く'],
+      bloomingMonths: [1, 2, 3, 4, 12],
+      categories: ['happiness'],
+      description: '鮮やかな色の花がこんもりと咲く、冬から春の鉢花です。',
+      trivia: '「死」を連想させる響きを避けて「サイネリア」と呼ばれることもあります。',
+      look: { shape: 'daisy', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yucca', name: 'ユッカ', kana: 'ゆっか', emoji: '🤍',
+      aliases: ['青年の木', 'イトラン'],
+      meanings: ['勇壮', '偉大', '颯爽とした'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['cheer'],
+      description: '剣のような葉と、釣り鐘形の白い花をもつ植物です。',
+      look: { shape: 'bell', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'astilbe', name: 'アスチルベ', kana: 'あすちるべ', emoji: '🌸',
+      aliases: ['アワモリショウマ'],
+      meanings: ['恋の訪れ', '自由'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['love'],
+      description: 'ふわふわした花穂が風にゆれる、初夏の花です。',
+      look: { shape: 'spike', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'feverfew', name: 'マトリカリア', kana: 'まとりかりあ', emoji: '🤍',
+      aliases: ['ナツシロギク', 'フィーバーフュー'],
+      meanings: ['集う喜び', '鎮静', '忍耐'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['happiness', 'cheer'],
+      description: '小さなデイジーのような花がたくさん集まって咲く花です。',
+      look: { shape: 'daisy', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'penstemon', name: 'ペンステモン', kana: 'ぺんすてもん', emoji: '🌺',
+      aliases: ['ツリガネヤナギ'],
+      meanings: ['あなたに見とれています', '高い理想'],
+      bloomingMonths: [5, 6, 7],
+      categories: [],
+      description: '釣り鐘形の花が穂のように並ぶ、初夏の花です。',
+      look: { shape: 'bell', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'gladiolus', name: 'グラジオラス', kana: 'ぐらじおらす', emoji: '🌷',
+      aliases: ['トウショウブ', '唐菖蒲'],
+      meanings: ['密会', '用心', '勝利', 'ひたむきな愛'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['cheer', 'love'],
+      description: '剣のような葉と、下から順に咲き上がる花が印象的です。',
+      trivia: '名前はラテン語で「小さな剣」を意味する言葉に由来します。',
+      look: { shape: 'spike', colors: ['#fbb3a0', '#ef7f6c', '#f7d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'kousa', name: 'ヤマボウシ', kana: 'やまぼうし', emoji: '🤍',
+      aliases: ['山法師'],
+      meanings: ['友情'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['friendship'],
+      description: '白い総苞が十字に開く、初夏の花木です。',
+      trivia: '中心の丸い花の集まりを坊主頭、白い総苞を頭巾に見立てた名前です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'tuberose', name: 'チューベローズ', kana: 'ちゅーべろーず', emoji: '🤍',
+      aliases: ['月下香', 'ゲッカコウ'],
+      meanings: ['危険な楽しみ', '冒険'],
+      bloomingMonths: [7, 8, 9, 10],
+      categories: [],
+      description: '夜に強く甘い香りを放つ、白い花です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'evening-primrose', name: 'ツキミソウ', kana: 'つきみそう', emoji: '🤍',
+      aliases: ['月見草'],
+      meanings: ['移り気', '無言の愛情', '自由な心'],
+      bloomingMonths: [5, 6, 7, 8, 9],
+      categories: ['love'],
+      description: '夕方に白い花を開き、翌朝にはしぼむ花です。',
+      trivia: '黄色い花のマツヨイグサも「月見草」と呼ばれることがありますが、別の種類です。',
+      look: { shape: 'cup', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'scarlet-rosemallow', name: 'モミジアオイ', kana: 'もみじあおい', emoji: '🌺',
+      aliases: ['紅葉葵', '紅蜀葵'],
+      meanings: ['優しく温和', '温和'],
+      bloomingMonths: [7, 8, 9],
+      categories: ['kindness'],
+      description: 'もみじのような葉と、真っ赤な大輪の花をもつ夏の花です。',
+      look: { shape: 'star', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yukiyanagi', name: 'ユキヤナギ', kana: 'ゆきやなぎ', emoji: '🤍',
+      aliases: ['雪柳', 'コゴメバナ'],
+      meanings: ['愛らしさ', '殊勝', '静かな思い'],
+      bloomingMonths: [3, 4],
+      categories: ['love'],
+      description: 'しだれた枝に、雪が積もったように白い小花が咲きます。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'shunran', name: 'シュンラン', kana: 'しゅんらん', emoji: '🌿',
+      aliases: ['春蘭'],
+      meanings: ['気品', '素朴', '清純'],
+      bloomingMonths: [3, 4],
+      categories: ['respect', 'sincerity'],
+      description: '春の林に咲く、素朴で品のある日本のランです。',
+      look: { shape: 'star', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'fuchsia', name: 'フクシア', kana: 'ふくしあ', emoji: '🌺',
+      aliases: ['ホクシャ', 'ツリウキソウ'],
+      meanings: ['信じる愛', 'つつましい愛', '好み'],
+      bloomingMonths: [4, 5, 6, 7],
+      categories: ['love', 'sincerity'],
+      description: 'イヤリングのような花が垂れ下がって咲く花です。',
+      look: { shape: 'bell', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hakobe', name: 'ハコベ', kana: 'はこべ', emoji: '🤍',
+      aliases: ['繁縷', 'ハコベラ'],
+      meanings: ['初恋の思い出', 'ランデブー'],
+      bloomingMonths: [3, 4, 5, 6],
+      categories: ['love', 'comfort'],
+      description: '道ばたに咲く、白く小さな星形の花です。',
+      trivia: '春の七草のひとつです。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'rhodanthe', name: 'ローダンセ', kana: 'ろーだんせ', emoji: '🌸',
+      aliases: ['ヒロハノハナカンザシ', '花簪'],
+      meanings: ['終わりのない友情', '変わらぬ思い', '温順'],
+      bloomingMonths: [3, 4, 5],
+      categories: ['friendship'],
+      description: 'カサカサした花びらが特徴で、ドライフラワーにも向く花です。',
+      look: { shape: 'daisy', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'mitsumata', name: 'ミツマタ', kana: 'みつまた', emoji: '🌼',
+      aliases: ['三椏'],
+      meanings: ['肉親の絆', '意外な思い', '強靭'],
+      bloomingMonths: [3, 4],
+      categories: ['cheer'],
+      description: '枝が三つに分かれ、先に丸い花の房をつける花木です。',
+      trivia: '樹皮は和紙や紙幣の原料として使われています。',
+      look: { shape: 'cluster', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'bay-laurel', name: 'ゲッケイジュ', kana: 'げっけいじゅ', emoji: '🤍',
+      aliases: ['月桂樹', 'ローリエ', 'ローレル'],
+      meanings: ['栄光', '勝利', '栄誉'],
+      bloomingMonths: [4, 5],
+      categories: ['respect', 'cheer'],
+      description: '香りのよい葉が料理にも使われる常緑樹です。',
+      trivia: '古代ギリシャでは、競技の勝者に月桂樹の冠が贈られました。',
+      look: { shape: 'cluster', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'african-violet', name: 'セントポーリア', kana: 'せんとぽーりあ', emoji: '💜',
+      aliases: ['アフリカスミレ'],
+      meanings: ['小さな愛', '深い愛', '親しみ'],
+      categories: ['love'],
+      description: 'ビロードのような葉と、スミレに似た花が愛らしい鉢花です。',
+      look: { shape: 'round', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'daffodil', name: 'スイセン', kana: 'すいせん', emoji: '🌼',
+      aliases: ['水仙', 'ナルシサス', 'ラッパスイセン'],
+      meanings: ['自己愛', 'うぬぼれ', '神秘'],
+      colorMeanings: [{ color: '黄', hex: '#f3d56b', meanings: ['私のもとへ帰って', '愛に応えて'] }, { color: '白', hex: '#f6f3ee', meanings: ['神秘', '尊重'] }],
+      bloomingMonths: [1, 2, 3, 4, 12],
+      categories: ['love'],
+      description: '寒い時期から凛と咲く、香りのよい球根植物です。',
+      trivia: 'ギリシャ神話で、水面に映る自分に恋をした青年ナルキッソスが花になったという物語があります。',
+      look: { shape: 'star', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'kalmia', name: 'カルミア', kana: 'かるみあ', emoji: '🌸',
+      aliases: ['アメリカシャクナゲ'],
+      meanings: ['大きな希望', '優美な女性', 'さわやかな笑顔'],
+      bloomingMonths: [5, 6],
+      categories: ['hope'],
+      description: '金平糖のようなつぼみから、傘の形の花が開く花木です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'rhododendron', name: 'シャクナゲ', kana: 'しゃくなげ', emoji: '🌸',
+      aliases: ['石楠花'],
+      meanings: ['威厳', '荘厳', '危険'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['respect'],
+      description: '大きな花がまとまって咲く、「花木の女王」とも呼ばれる花です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'mukuge', name: 'ムクゲ', kana: 'むくげ', emoji: '💜',
+      aliases: ['木槿'],
+      meanings: ['信念', '新しい美', '繊細な美'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: '夏から秋に次々と花を咲かせる、フヨウの仲間の花木です。',
+      trivia: '韓国の国花として知られています。',
+      look: { shape: 'round', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'apricot', name: 'アンズ', kana: 'あんず', emoji: '🌸',
+      aliases: ['杏'],
+      meanings: ['臆病な愛', '疑い', '乙女のはにかみ'],
+      bloomingMonths: [3, 4],
+      categories: ['love'],
+      description: '梅に似た淡いピンクの花を咲かせる果樹です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'periwinkle', name: 'ツルニチニチソウ', kana: 'つるにちにちそう', emoji: '💙',
+      aliases: ['ビンカ', 'ツルビンカ'],
+      meanings: ['楽しい思い出', '幼なじみ', '優しい追憶'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['happiness', 'comfort', 'kindness'],
+      description: 'つるを伸ばして広がり、青紫の花を咲かせる植物です。',
+      look: { shape: 'round', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ornithogalum', name: 'オーニソガラム', kana: 'おーにそがらむ', emoji: '🤍',
+      aliases: ['オオアマナ', 'ベツレヘムの星'],
+      meanings: ['純粋', '才能', '潔白'],
+      bloomingMonths: [3, 4, 5, 6],
+      categories: ['sincerity'],
+      description: '星形の白い花がたくさん咲く球根植物です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'scilla', name: 'シラー', kana: 'しらー', emoji: '💙',
+      aliases: ['スキラ'],
+      meanings: ['寂しさ', '哀れ', '変わらない愛'],
+      bloomingMonths: [4, 5],
+      categories: ['love'],
+      description: '星形の青い小花を咲かせる、春の球根植物です。',
+      look: { shape: 'star', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'helichrysum', name: 'ヘリクリサム', kana: 'へりくりさむ', emoji: '🧡',
+      aliases: ['ムギワラギク', '帝王貝細工'],
+      meanings: ['永遠の記憶', '献身', '黄金色の輝き'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['comfort'],
+      description: '麦わらのような質感の花で、ドライフラワーの定番です。',
+      look: { shape: 'daisy', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'armeria', name: 'アルメリア', kana: 'あるめりあ', emoji: '🌸',
+      aliases: ['ハマカンザシ', '浜簪'],
+      meanings: ['思いやり', '共感', '同情'],
+      bloomingMonths: [3, 4, 5],
+      categories: ['kindness'],
+      description: '丸いボール状の花が、細い茎の先に咲く花です。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'money-tree', name: 'カネノナルキ', kana: 'かねのなるき', emoji: '🌸',
+      aliases: ['金のなる木', '花月', 'クラッスラ'],
+      meanings: ['一攫千金', '幸運を招く', '富'],
+      bloomingMonths: [1, 2, 3, 11, 12],
+      categories: ['happiness'],
+      description: 'ぷっくりした葉をもつ、縁起のよい多肉植物です。',
+      trivia: '葉を硬貨に見立てた、縁起のよい名前で親しまれています。',
+      look: { shape: 'star', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'cornflower', name: 'ヤグルマギク', kana: 'やぐるまぎく', emoji: '💙',
+      aliases: ['矢車菊', 'コーンフラワー', 'セントーレア'],
+      meanings: ['繊細', '優美', '教育'],
+      bloomingMonths: [4, 5, 6],
+      categories: [],
+      description: '鮮やかな青い花が印象的な、春の草花です。',
+      trivia: 'ドイツの国花として知られています。',
+      look: { shape: 'star', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'peach', name: 'モモ', kana: 'もも', emoji: '🌸',
+      aliases: ['桃', 'ハナモモ'],
+      meanings: ['私はあなたのとりこ', '天下無敵', '気立てのよさ'],
+      bloomingMonths: [3, 4],
+      categories: [],
+      description: 'ひな祭りを彩る、やさしいピンクの花木です。',
+      trivia: '桃には邪気を払う力があると考えられ、桃の節句に飾られてきました。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'azalea', name: 'アザレア', kana: 'あざれあ', emoji: '🌸',
+      aliases: ['セイヨウツツジ', 'オランダツツジ'],
+      meanings: ['節制', '恋の喜び', '愛で満たされる'],
+      bloomingMonths: [3, 4, 5],
+      categories: ['love', 'happiness'],
+      description: 'ツツジを品種改良した、華やかな鉢花です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'clivia', name: 'クンシラン', kana: 'くんしらん', emoji: '🧡',
+      aliases: ['君子蘭', 'クリビア'],
+      meanings: ['高貴', '誠実', '情け深い'],
+      bloomingMonths: [3, 4, 5],
+      categories: ['respect', 'sincerity'],
+      description: 'つややかな葉と、オレンジの花房が上品な植物です。',
+      look: { shape: 'star', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'linaria', name: 'リナリア', kana: 'りなりあ', emoji: '💜',
+      aliases: ['ヒメキンギョソウ'],
+      meanings: ['この恋に気づいて', '幻想', '私の恋を知ってください'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['love'],
+      description: '小さなキンギョソウのような花が集まって咲く花です。',
+      look: { shape: 'spike', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'campanula', name: 'カンパニュラ', kana: 'かんぱにゅら', emoji: '💜',
+      aliases: ['フウリンソウ', 'ツリガネソウ', 'ベルフラワー'],
+      meanings: ['感謝', '誠実', '節操'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['thanks', 'sincerity'],
+      description: '釣り鐘のような形の花が愛らしい花です。',
+      trivia: '名前はラテン語で「小さな鐘」を意味します。',
+      look: { shape: 'bell', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'nirinso', name: 'ニリンソウ', kana: 'にりんそう', emoji: '🤍',
+      aliases: ['二輪草'],
+      meanings: ['友情', '協力', 'ずっと離れない'],
+      bloomingMonths: [3, 4, 5],
+      categories: ['friendship'],
+      description: '一本の茎から二輪ずつ花が咲くことが多い山野草です。',
+      look: { shape: 'round', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'asebi', name: 'アセビ', kana: 'あせび', emoji: '🤍',
+      aliases: ['馬酔木', 'アシビ'],
+      meanings: ['犠牲', '献身', '清純な心'],
+      bloomingMonths: [2, 3, 4],
+      categories: ['sincerity'],
+      description: 'スズランのような小花が房になって垂れる花木です。',
+      trivia: '馬が葉を食べると酔ったようになることから「馬酔木」と書きます。',
+      look: { shape: 'bell', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'lupinus', name: 'ルピナス', kana: 'るぴなす', emoji: '💜',
+      aliases: ['ノボリフジ', '昇り藤'],
+      meanings: ['想像力', 'いつも幸せ', '貪欲'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['happiness'],
+      description: '藤の花を逆さにしたような花穂が立ち上がる花です。',
+      look: { shape: 'spike', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'shasta-daisy', name: 'シャスタデイジー', kana: 'しゃすたでいじー', emoji: '🤍',
+      aliases: [],
+      meanings: ['平和', '忍耐', '万事忍耐'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['cheer'],
+      description: '清楚な白い花びらの、大輪のデイジーです。',
+      look: { shape: 'daisy', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'california-poppy', name: 'ハナビシソウ', kana: 'はなびしそう', emoji: '🧡',
+      aliases: ['花菱草', 'カリフォルニアポピー'],
+      meanings: ['私の希望を受け入れて', '富', '成功'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['hope', 'cheer'],
+      description: '日が当たると花を開く、明るいオレンジの花です。',
+      look: { shape: 'cup', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'broom', name: 'エニシダ', kana: 'えにしだ', emoji: '🌼',
+      aliases: ['金雀枝'],
+      meanings: ['謙遜', '清楚', '卑下'],
+      bloomingMonths: [4, 5],
+      categories: ['sincerity'],
+      description: '蝶のような黄色い花が枝いっぱいに咲く花木です。',
+      trivia: 'ヨーロッパでは、魔女のほうきの材料になったという言い伝えがあります。',
+      look: { shape: 'cluster', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'tsukushi', name: 'ツクシ', kana: 'つくし', emoji: '🌾',
+      aliases: ['土筆', 'スギナ'],
+      meanings: ['向上心', '意外', '驚き'],
+      bloomingMonths: [3, 4],
+      categories: ['future'],
+      description: '春の野に顔を出す、スギナの胞子をつくる茎です。',
+      look: { shape: 'spike', colors: ['#e3c9a6', '#b9936a', '#7e5a3a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ikariso', name: 'イカリソウ', kana: 'いかりそう', emoji: '🌸',
+      aliases: ['碇草', '錨草'],
+      meanings: ['あなたを離さない', '君を捕らえる', '人生の出発'],
+      bloomingMonths: [4, 5],
+      categories: ['future'],
+      description: '船の碇のような形の花を咲かせる山野草です。',
+      look: { shape: 'star', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'blue-daisy', name: 'ブルーデイジー', kana: 'ぶるーでいじー', emoji: '💙',
+      aliases: ['フェリシア', 'ルリヒナギク'],
+      meanings: ['幸運', '協力', '純粋'],
+      bloomingMonths: [3, 4, 5],
+      categories: ['happiness', 'sincerity'],
+      description: '青い花びらと黄色い中心がさわやかな花です。',
+      look: { shape: 'daisy', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'iberis', name: 'イベリス', kana: 'いべりす', emoji: '🤍',
+      aliases: ['キャンディタフト', 'マガリバナ'],
+      meanings: ['心をひきつける', '初恋の思い出', '甘い誘惑'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['love', 'comfort'],
+      description: '白い小花が集まって、丸く咲く花です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'white-lace-flower', name: 'ホワイトレースフラワー', kana: 'ほわいとれーすふらわー', emoji: '🤍',
+      aliases: ['ドクゼリモドキ', 'アンミ'],
+      meanings: ['感謝', '可憐な心', '繊細'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['thanks'],
+      description: 'レースのような白い小花が広がる、ブーケの名脇役です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'cercis', name: 'ハナズオウ', kana: 'はなずおう', emoji: '🌺',
+      aliases: ['花蘇芳'],
+      meanings: ['目覚め', '裏切り', '疑惑'],
+      bloomingMonths: [4],
+      categories: [],
+      description: '葉が出る前に、枝に直接赤紫の小花がびっしりつく花木です。',
+      look: { shape: 'cluster', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hanakaido', name: 'ハナカイドウ', kana: 'はなかいどう', emoji: '🌸',
+      aliases: ['花海棠', 'カイドウ'],
+      meanings: ['温和', '美人の眠り', '艶麗'],
+      bloomingMonths: [4, 5],
+      categories: ['kindness'],
+      description: 'うつむき加減に咲く、淡いピンクの花木です。',
+      trivia: '唐の玄宗皇帝が、酔った楊貴妃を「海棠の眠り未だ足らず」とたとえた故事が知られています。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'tosamizuki', name: 'トサミズキ', kana: 'とさみずき', emoji: '🌼',
+      aliases: ['土佐水木'],
+      meanings: ['優雅', '清楚', '期待'],
+      bloomingMonths: [3, 4],
+      categories: ['sincerity', 'hope'],
+      description: '淡い黄色の花が房になって垂れ下がる花木です。',
+      look: { shape: 'bell', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'thistle', name: 'アザミ', kana: 'あざみ', emoji: '🌺',
+      aliases: ['薊', 'ノアザミ'],
+      meanings: ['独立', '報復', '触れないで', '厳格'],
+      bloomingMonths: [5, 6, 7, 8],
+      categories: [],
+      description: 'とげのある葉と、紫の花が凛とした野の花です。',
+      trivia: 'スコットランドの国花として知られています。',
+      look: { shape: 'cluster', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'baimo', name: 'バイモ', kana: 'ばいも', emoji: '🤍',
+      aliases: ['貝母', 'アミガサユリ'],
+      meanings: ['威厳', '謙虚な心', '才能'],
+      bloomingMonths: [3, 4],
+      categories: ['respect'],
+      description: 'うつむいて咲く、編み笠のような花です。',
+      look: { shape: 'bell', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'renge', name: 'レンゲソウ', kana: 'れんげそう', emoji: '🌺',
+      aliases: ['蓮華草', 'ゲンゲ', 'レンゲ'],
+      meanings: ['心が和らぐ', 'あなたと一緒なら苦痛がやわらぐ', '感化'],
+      bloomingMonths: [4, 5],
+      categories: ['comfort'],
+      description: '春の田んぼをピンクに染める、なつかしい花です。',
+      trivia: 'かつては田んぼの緑肥として広く育てられていました。',
+      look: { shape: 'cluster', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'delphinium', name: 'デルフィニウム', kana: 'でるふぃにうむ', emoji: '💙',
+      aliases: ['オオヒエンソウ'],
+      meanings: ['清明', 'あなたは幸福をふりまく', '高貴'],
+      bloomingMonths: [5, 6],
+      categories: ['sincerity', 'happiness', 'respect'],
+      description: '澄んだ青い花が穂のように咲く、初夏の花です。',
+      look: { shape: 'spike', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'kobushi', name: 'コブシ', kana: 'こぶし', emoji: '🤍',
+      aliases: ['辛夷'],
+      meanings: ['友情', '歓迎', '自然の愛'],
+      bloomingMonths: [3, 4],
+      categories: ['friendship', 'happiness', 'love'],
+      description: '早春、白い花を枝いっぱいに咲かせる花木です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hananira', name: 'ハナニラ', kana: 'はなにら', emoji: '💜',
+      aliases: ['花韮', 'イフェイオン'],
+      meanings: ['悲しい別れ', '星に願いを'],
+      bloomingMonths: [3, 4],
+      categories: ['hope'],
+      description: '星形の淡い青紫の花を咲かせる、春の球根植物です。',
+      look: { shape: 'star', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'digitalis', name: 'ジギタリス', kana: 'じぎたりす', emoji: '🌸',
+      aliases: ['キツネノテブクロ', 'フォックスグローブ'],
+      meanings: ['熱愛', '不誠実', '隠されぬ恋'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['love'],
+      description: '筒形の花が穂のように並んで咲く、存在感のある花です。',
+      trivia: '有毒植物ですが、かつては強心剤の原料として使われました。',
+      look: { shape: 'spike', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'bridal-veil', name: 'ブライダルベール', kana: 'ぶらいだるべーる', emoji: '🤍',
+      aliases: [],
+      meanings: ['幸福', '願い続ける'],
+      bloomingMonths: [4, 5, 6, 7, 8, 9, 10],
+      categories: ['happiness', 'hope'],
+      description: '花嫁のベールのように、白い小花が垂れ下がって咲く植物です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yamabuki', name: 'ヤマブキ', kana: 'やまぶき', emoji: '🌼',
+      aliases: ['山吹'],
+      meanings: ['気品', '崇高', '金運'],
+      bloomingMonths: [4, 5],
+      categories: ['respect'],
+      description: '春の山吹色がまぶしい、日本の花木です。',
+      trivia: '太田道灌が雨具を借りようとして、娘から山吹の一枝を差し出されたという話が有名です。',
+      look: { shape: 'round', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ebine', name: 'エビネ', kana: 'えびね', emoji: '🌾',
+      aliases: ['海老根'],
+      meanings: ['誠実', '謙虚', '忍耐'],
+      bloomingMonths: [4, 5],
+      categories: ['sincerity', 'cheer'],
+      description: '春に咲く、素朴で品のある日本のランです。',
+      look: { shape: 'spike', colors: ['#e3c9a6', '#b9936a', '#7e5a3a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'gobo', name: 'ゴボウ', kana: 'ごぼう', emoji: '🌺',
+      aliases: ['牛蒡'],
+      meanings: ['いじめないで', '私にさわらないで', '人格者'],
+      bloomingMonths: [6, 7],
+      categories: [],
+      description: '食用の根で知られる植物で、アザミに似た花を咲かせます。',
+      look: { shape: 'cluster', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'strawberry', name: 'イチゴ', kana: 'いちご', emoji: '🤍',
+      aliases: ['苺', 'ストロベリー', 'ワイルドストロベリー', '野イチゴ'],
+      meanings: ['尊重と愛情', '幸福な家庭', '先見の明'],
+      bloomingMonths: [3, 4, 5],
+      categories: ['love', 'happiness'],
+      description: '白い小さな花のあとに、赤い実をつける植物です。',
+      look: { shape: 'round', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'nigella', name: 'ニゲラ', kana: 'にげら', emoji: '💙',
+      aliases: ['クロタネソウ', 'ラブ・イン・ア・ミスト'],
+      meanings: ['夢の中の恋', '当惑', 'ひそかな喜び'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['love', 'happiness'],
+      description: '糸のような葉に包まれて咲く、繊細な花です。',
+      look: { shape: 'star', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'geranium', name: 'ゼラニウム', kana: 'ぜらにうむ', emoji: '🌺',
+      aliases: ['テンジクアオイ', 'ペラルゴニウム'],
+      meanings: ['尊敬', '信頼', '真の友情'],
+      colorMeanings: [{ color: '赤', hex: '#e2566a', meanings: ['君ありて幸福'] }, { color: 'ピンク', hex: '#f5a6bf', meanings: ['決心'] }, { color: '白', hex: '#f6f3ee', meanings: ['私はあなたの愛を信じない'], note: '贈り物では避けられることがあります' }],
+      bloomingMonths: [4, 5, 6, 7, 8, 9, 10],
+      categories: ['respect', 'sincerity', 'friendship'],
+      description: '丈夫で長く咲き続ける、ベランダの定番の花です。',
+      look: { shape: 'round', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'adiantum', name: 'アジアンタム', kana: 'あじあんたむ', emoji: '🌿',
+      aliases: ['ホウライシダ'],
+      meanings: ['天真爛漫', '無垢', '繊細'],
+      categories: [],
+      description: 'やわらかな小さな葉が涼しげなシダ植物です。',
+      look: { shape: 'leaf', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'china-aster', name: 'アスター', kana: 'あすたー', emoji: '💜',
+      aliases: ['エゾギク', 'サツマギク'],
+      meanings: ['信じる恋', '変化を好む', '追憶'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: ['love', 'sincerity', 'comfort'],
+      description: '色数が豊富で、仏花や花束に使われる花です。',
+      look: { shape: 'layered', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'japanese-plum', name: 'スモモ', kana: 'すもも', emoji: '🤍',
+      aliases: ['李', 'プラム'],
+      meanings: ['誠実', '困難', '独立'],
+      bloomingMonths: [3, 4],
+      categories: ['sincerity', 'cheer'],
+      description: '春に白い花を咲かせ、夏に甘酸っぱい実をつける果樹です。',
+      look: { shape: 'round', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'nasturtium', name: 'ナスタチウム', kana: 'なすたちうむ', emoji: '🧡',
+      aliases: ['キンレンカ', '金蓮花'],
+      meanings: ['困難に打ち勝つ', '愛国心', '勝利'],
+      bloomingMonths: [4, 5, 6, 7, 9, 10],
+      categories: ['cheer', 'love'],
+      description: '丸い葉と鮮やかな花をもつ、食べられる花です。',
+      look: { shape: 'round', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'dimorphotheca', name: 'ディモルフォセカ', kana: 'でぃもるふぉせか', emoji: '🧡',
+      aliases: ['アフリカキンセンカ'],
+      meanings: ['変わらぬ愛', '元気', '富'],
+      bloomingMonths: [3, 4, 5],
+      categories: ['love', 'cheer'],
+      description: '日が当たると花を開く、つやのある花びらの花です。',
+      look: { shape: 'daisy', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'moss-phlox', name: 'シバザクラ', kana: 'しばざくら', emoji: '🌸',
+      aliases: ['芝桜', 'モスフロックス'],
+      meanings: ['合意', '忍耐', '臆病な心'],
+      bloomingMonths: [4, 5],
+      categories: ['cheer'],
+      description: '地面をじゅうたんのように覆って咲く春の花です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'apple', name: 'リンゴ', kana: 'りんご', emoji: '🤍',
+      aliases: ['林檎'],
+      meanings: ['選択', '最も美しい人へ', '名声'],
+      bloomingMonths: [4, 5],
+      categories: [],
+      description: '春に白や淡いピンクの花を咲かせる果樹です。',
+      trivia: 'ギリシャ神話で「最も美しい女神へ」と書かれた黄金のリンゴの話があります。',
+      look: { shape: 'round', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'coreopsis', name: 'ハルシャギク', kana: 'はるしゃぎく', emoji: '🌼',
+      aliases: ['波斯菊', 'コレオプシス'],
+      meanings: ['一目惚れ', 'いつも陽気', '上機嫌'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: ['happiness'],
+      description: '黄色い花びらの中心に赤茶色の模様が入る花です。',
+      look: { shape: 'daisy', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'dodan', name: 'ドウダンツツジ', kana: 'どうだんつつじ', emoji: '🤍',
+      aliases: ['満天星', '灯台躑躅'],
+      meanings: ['上品', '返礼', '節制'],
+      bloomingMonths: [4, 5],
+      categories: ['thanks'],
+      description: '小さな鈴のような白い花を咲かせ、秋は紅葉が美しい花木です。',
+      look: { shape: 'bell', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'harujion', name: 'ハルジオン', kana: 'はるじおん', emoji: '🌸',
+      aliases: ['春紫菀'],
+      meanings: ['追想の愛'],
+      bloomingMonths: [4, 5, 6],
+      categories: ['love', 'comfort'],
+      description: '細い花びらが繊細な、道ばたの春の花です。',
+      look: { shape: 'daisy', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'utsugi', name: 'ウツギ', kana: 'うつぎ', emoji: '🤍',
+      aliases: ['空木', '卯の花', 'ウノハナ'],
+      meanings: ['秘密', '古風', '謙虚'],
+      bloomingMonths: [5, 6],
+      categories: [],
+      description: '初夏に白い花を咲かせ、「卯の花」と呼ばれる花木です。',
+      trivia: '唱歌「夏は来ぬ」の「卯の花の匂う垣根に」はこの花のことです。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'godetia', name: 'ゴデチア', kana: 'ごでちあ', emoji: '🌸',
+      aliases: ['イロマツヨイ', 'クラーキア'],
+      meanings: ['変わらぬ熱愛', 'お慕いいたします'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['love'],
+      description: 'サテンのような光沢の花びらが美しい花です。',
+      look: { shape: 'cup', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'catchfly', name: 'ムシトリナデシコ', kana: 'むしとりなでしこ', emoji: '🌺',
+      aliases: ['虫取撫子', 'コマチソウ'],
+      meanings: ['罠', '未練', '青春の恋'],
+      bloomingMonths: [5, 6],
+      categories: ['love'],
+      description: '鮮やかなピンクの小花が集まって咲く花です。',
+      trivia: '茎の一部がべたつき、小さな虫がつくことが名前の由来です。',
+      look: { shape: 'cluster', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'renge-tsutsuji', name: 'レンゲツツジ', kana: 'れんげつつじ', emoji: '🧡',
+      aliases: ['蓮華躑躅'],
+      meanings: ['情熱', '堅実'],
+      bloomingMonths: [5, 6],
+      categories: [],
+      description: '高原を朱色に染める、日本のツツジです。',
+      look: { shape: 'round', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'pothos', name: 'ポトス', kana: 'ぽとす', emoji: '🌿',
+      aliases: ['オウゴンカズラ'],
+      meanings: ['永遠の富', '華やかな明るさ'],
+      categories: [],
+      description: 'つるを伸ばして育つ、丈夫な観葉植物です。',
+      look: { shape: 'leaf', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'larkspur', name: 'ラークスパー', kana: 'らーくすぱー', emoji: '💜',
+      aliases: ['チドリソウ', '千鳥草', 'ヒエンソウ'],
+      meanings: ['陽気', '軽快', '自由'],
+      bloomingMonths: [5, 6],
+      categories: ['happiness'],
+      description: '鳥が飛ぶような花が穂に並ぶ、初夏の花です。',
+      look: { shape: 'spike', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ichihatsu', name: 'イチハツ', kana: 'いちはつ', emoji: '💜',
+      aliases: ['一八', '鳶尾'],
+      meanings: ['火の用心', '知恵', '使者'],
+      bloomingMonths: [4, 5],
+      categories: ['respect'],
+      description: 'アヤメの仲間でいち早く咲く、淡い紫の花です。',
+      trivia: '昔はわらぶき屋根の上に植えられ、火災よけとされていました。',
+      look: { shape: 'star', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'pear', name: 'ナシ', kana: 'なし', emoji: '🤍',
+      aliases: ['梨'],
+      meanings: ['愛情', '博愛', '和やかな愛情'],
+      bloomingMonths: [4],
+      categories: ['love'],
+      description: '春に白く清らかな花を咲かせる果樹です。',
+      look: { shape: 'round', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ixia', name: 'イキシア', kana: 'いきしあ', emoji: '🌸',
+      aliases: ['ヤリズイセン'],
+      meanings: ['団結して当たる', '誇り高い'],
+      bloomingMonths: [4, 5],
+      categories: [],
+      description: '細い茎の先に、星形の花が並んで咲く球根植物です。',
+      look: { shape: 'star', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'kodemari', name: 'コデマリ', kana: 'こでまり', emoji: '🤍',
+      aliases: ['小手毬', 'スズカケ'],
+      meanings: ['友情', '努力', '優雅'],
+      bloomingMonths: [4, 5],
+      categories: ['friendship'],
+      description: '小さな手毬のような白い花房が連なる花木です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'bluebell', name: 'ブルーベル', kana: 'ぶるーべる', emoji: '💙',
+      aliases: ['ツリガネズイセン', 'ヒアシンソイデス'],
+      meanings: ['謙遜', '変わらぬ心', '悲嘆'],
+      bloomingMonths: [4, 5],
+      categories: [],
+      description: '青い釣り鐘形の花が垂れ下がって咲く球根植物です。',
+      look: { shape: 'bell', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'scabiosa', name: 'スカビオサ', kana: 'すかびおさ', emoji: '💜',
+      aliases: ['マツムシソウ', '西洋松虫草'],
+      meanings: ['朝の花嫁', '不幸な愛', '私はすべてを失った'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['love', 'happiness'],
+      description: 'レースのような花が、長い茎の先に咲く花です。',
+      look: { shape: 'cluster', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ajuga', name: 'アジュガ', kana: 'あじゅが', emoji: '💙',
+      aliases: ['セイヨウキランソウ'],
+      meanings: ['強い友情', '心休まる家庭'],
+      bloomingMonths: [4, 5],
+      categories: ['friendship', 'cheer'],
+      description: '地面を覆うように広がり、青紫の花穂を立てる植物です。',
+      look: { shape: 'spike', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'shaga', name: 'シャガ', kana: 'しゃが', emoji: '💜',
+      aliases: ['射干', '胡蝶花'],
+      meanings: ['反抗', '友人が多い', '私を認めて'],
+      bloomingMonths: [4, 5],
+      categories: ['friendship'],
+      description: '林の中に群れて咲く、フリルのある白い花です。',
+      look: { shape: 'star', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'mock-orange', name: 'バイカウツギ', kana: 'ばいかうつぎ', emoji: '🤍',
+      aliases: ['梅花空木'],
+      meanings: ['気品', '思い出', '香気'],
+      bloomingMonths: [5, 6],
+      categories: ['respect', 'comfort'],
+      description: '梅に似た白い花を咲かせ、よい香りを放つ花木です。',
+      look: { shape: 'round', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'mitsuba-tsutsuji', name: 'ミツバツツジ', kana: 'みつばつつじ', emoji: '🌺',
+      aliases: ['三葉躑躅'],
+      meanings: ['節制', '抑制のきいた生活'],
+      bloomingMonths: [4, 5],
+      categories: [],
+      description: '葉が出る前に、赤紫の花を咲かせるツツジです。',
+      look: { shape: 'round', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'phlox', name: 'フロックス', kana: 'ふろっくす', emoji: '🌸',
+      aliases: ['クサキョウチクトウ', 'オイランソウ'],
+      meanings: ['合意', '温和', '協調'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: ['kindness'],
+      description: '小花がまとまって咲く、夏の花壇の花です。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'mizubasho', name: 'ミズバショウ', kana: 'みずばしょう', emoji: '🤍',
+      aliases: ['水芭蕉'],
+      meanings: ['美しい思い出', '変わらぬ美しさ'],
+      bloomingMonths: [4, 5, 6, 7],
+      categories: ['comfort'],
+      description: '雪どけの湿原に、白い仏炎苞を広げる植物です。',
+      trivia: '唱歌「夏の思い出」で歌われる尾瀬の風景が有名です。',
+      look: { shape: 'trumpet', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'stokesia', name: 'ストケシア', kana: 'すとけしあ', emoji: '💜',
+      aliases: ['ルリギク', '瑠璃菊'],
+      meanings: ['追想', '清楚な娘'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['comfort', 'sincerity'],
+      description: '細かく切れ込んだ花びらが涼しげな花です。',
+      look: { shape: 'daisy', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'egonoki', name: 'エゴノキ', kana: 'えごのき', emoji: '🤍',
+      aliases: ['野茉莉', 'チシャノキ'],
+      meanings: ['壮大'],
+      bloomingMonths: [5, 6],
+      categories: [],
+      description: '初夏、白い花が鈴なりに下向きに咲く木です。',
+      look: { shape: 'bell', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'water-lily', name: 'スイレン', kana: 'すいれん', emoji: '🌸',
+      aliases: ['睡蓮', 'ヒツジグサ'],
+      meanings: ['清純な心', '信仰', '信頼'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: ['sincerity'],
+      description: '水面に浮かぶように咲く、夏の水辺の花です。',
+      trivia: '画家モネが繰り返し描いた花としても知られています。',
+      look: { shape: 'layered', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'kiri', name: 'キリ', kana: 'きり', emoji: '💜',
+      aliases: ['桐'],
+      meanings: ['高尚', '高貴'],
+      bloomingMonths: [5],
+      categories: ['respect'],
+      description: '初夏に淡い紫の花を咲かせる木です。',
+      trivia: '桐の紋は日本政府の紋章にも使われています。',
+      look: { shape: 'spike', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ageratum', name: 'アゲラタム', kana: 'あげらたむ', emoji: '💜',
+      aliases: ['カッコウアザミ', '郭公薊'],
+      meanings: ['信頼', '幸せを得る', '安楽'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10, 11],
+      categories: ['sincerity', 'happiness'],
+      description: 'ふわふわした小花がこんもりと咲く花です。',
+      look: { shape: 'cluster', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'thunbergia', name: 'ツンベルギア', kana: 'つんべるぎあ', emoji: '🧡',
+      aliases: ['ヤハズカズラ'],
+      meanings: ['美しい瞳', '黒い瞳'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: [],
+      description: '中心が黒い花が瞳のように見える、つる植物です。',
+      look: { shape: 'round', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hawthorn', name: 'サンザシ', kana: 'さんざし', emoji: '🤍',
+      aliases: ['山査子', 'ホーソン'],
+      meanings: ['希望', '慎重', '唯一の恋'],
+      bloomingMonths: [4, 5],
+      categories: ['hope', 'love'],
+      description: '春に白い花を咲かせ、秋に赤い実をつける花木です。',
+      look: { shape: 'round', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'dokudami', name: 'ドクダミ', kana: 'どくだみ', emoji: '🤍',
+      aliases: ['十薬', 'ジュウヤク'],
+      meanings: ['白い追憶', '野生'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['comfort'],
+      description: '日陰に白い十字の花を咲かせる、薬草として知られる植物です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'allium', name: 'アリウム', kana: 'ありうむ', emoji: '💜',
+      aliases: ['ハナネギ', 'ギガンチウム'],
+      meanings: ['正しい主張', '深い悲しみ', '無限の悲しみ'],
+      bloomingMonths: [5, 6],
+      categories: [],
+      description: 'ネギの仲間で、丸いボールのような花を咲かせます。',
+      look: { shape: 'cluster', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'exacum', name: 'エキザカム', kana: 'えきざかむ', emoji: '💜',
+      aliases: ['ベニヒメリンドウ'],
+      meanings: ['あなたを愛します', '愛の囁き'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['love'],
+      description: '小さな紫の花がこんもりと咲く、甘い香りの花です。',
+      look: { shape: 'round', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'petunia', name: 'ペチュニア', kana: 'ぺちゅにあ', emoji: '🌺',
+      aliases: ['ツクバネアサガオ'],
+      meanings: ['あなたと一緒なら心がやわらぐ', '心のやすらぎ'],
+      bloomingMonths: [4, 5, 6, 7, 8, 9, 10],
+      categories: ['comfort'],
+      description: '春から秋まで長く咲き続ける、花壇の定番の花です。',
+      look: { shape: 'trumpet', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'satsuki', name: 'サツキ', kana: 'さつき', emoji: '🌸',
+      aliases: ['皐月', 'サツキツツジ'],
+      meanings: ['節制', '貞淑'],
+      bloomingMonths: [5, 6],
+      categories: [],
+      description: '旧暦の五月ごろに咲く、ツツジの仲間です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'bottlebrush', name: 'ブラシノキ', kana: 'ぶらしのき', emoji: '🌺',
+      aliases: ['カリステモン', '金宝樹'],
+      meanings: ['はかない恋', '恋の炎', '恋心'],
+      bloomingMonths: [5, 6],
+      categories: ['love'],
+      description: 'びんを洗うブラシのような赤い花が咲く木です。',
+      look: { shape: 'spike', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'katabami', name: 'カタバミ', kana: 'かたばみ', emoji: '🌼',
+      aliases: ['酢漿草', 'オキザリス'],
+      meanings: ['喜び', '輝く心', '母のやさしさ'],
+      bloomingMonths: [4, 5, 6, 7, 8, 9],
+      categories: ['happiness'],
+      description: 'ハート形の三つ葉と、小さな黄色い花をもつ植物です。',
+      look: { shape: 'round', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yuzu', name: 'ユズ', kana: 'ゆず', emoji: '🤍',
+      aliases: ['柚子'],
+      meanings: ['健康美', '汚れなき人', '恋のため息'],
+      bloomingMonths: [5, 6],
+      categories: ['health', 'love'],
+      description: '初夏に白い花を咲かせる、香りのよい柑橘です。',
+      trivia: '冬至にゆず湯に入る習慣が知られています。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hyssop', name: 'ヒソップ', kana: 'ひそっぷ', emoji: '💙',
+      aliases: ['ヤナギハッカ'],
+      meanings: ['清潔', '浄化', '神聖'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: ['sincerity'],
+      description: '青紫の花穂をもつ、古くからのハーブです。',
+      look: { shape: 'spike', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'olive', name: 'オリーブ', kana: 'おりーぶ', emoji: '🤍',
+      aliases: [],
+      meanings: ['平和', '知恵'],
+      bloomingMonths: [5, 6],
+      categories: ['respect'],
+      description: '銀色がかった葉が美しく、平和の象徴とされる木です。',
+      trivia: 'ハトがオリーブの枝をくわえる姿は、平和のシンボルとして知られています。',
+      look: { shape: 'cluster', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'sandersonia', name: 'サンダーソニア', kana: 'さんだーそにあ', emoji: '🧡',
+      aliases: ['クリスマスベル', 'チャイニーズランタンリリー'],
+      meanings: ['祈り', '望郷', '愛嬌'],
+      bloomingMonths: [6, 7],
+      categories: ['love'],
+      description: 'ちょうちんのようなオレンジの花が連なる花です。',
+      look: { shape: 'bell', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'odemari', name: 'オオデマリ', kana: 'おおでまり', emoji: '🤍',
+      aliases: ['大手毬', 'テマリバナ'],
+      meanings: ['華やかな恋', '約束を守って', '私は誓います'],
+      bloomingMonths: [4, 5],
+      categories: ['love'],
+      description: '白い手毬のような大きな花房をつける花木です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'gloriosa', name: 'グロリオサ', kana: 'ぐろりおさ', emoji: '🌺',
+      aliases: ['キツネユリ', 'ユリグルマ'],
+      meanings: ['栄光', '頑強', '勇敢'],
+      bloomingMonths: [7, 8, 9],
+      categories: ['respect', 'cheer'],
+      description: '炎のように反り返る花びらが情熱的な花です。',
+      look: { shape: 'star', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'veronica', name: 'ベロニカ', kana: 'べろにか', emoji: '💙',
+      aliases: ['ルリトラノオ'],
+      meanings: ['忠実', '名誉', '達成'],
+      bloomingMonths: [5, 6, 7, 8],
+      categories: ['sincerity', 'respect'],
+      description: '青い小花が穂のように咲く、すっきりした花です。',
+      look: { shape: 'spike', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'columbine', name: 'オダマキ', kana: 'おだまき', emoji: '💜',
+      aliases: ['苧環', 'アクイレギア'],
+      meanings: ['断固として勝つ', '必ず手に入れる', '愚か'],
+      bloomingMonths: [4, 5, 6],
+      categories: [],
+      description: 'うつむいて咲く、独特な形の花です。',
+      look: { shape: 'bell', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'atsumoriso', name: 'アツモリソウ', kana: 'あつもりそう', emoji: '🌸',
+      aliases: ['敦盛草'],
+      meanings: ['君を忘れない', '変わらぬ愛'],
+      bloomingMonths: [5, 6],
+      categories: ['comfort', 'love'],
+      description: '袋のような形の花をもつ、希少な野生のランです。',
+      look: { shape: 'cup', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'thyme', name: 'タイム', kana: 'たいむ', emoji: '💜',
+      aliases: ['タチジャコウソウ'],
+      meanings: ['勇気', '活動力', '強さ'],
+      bloomingMonths: [4, 5, 6, 7],
+      categories: ['cheer'],
+      description: '小さな葉と花をもつ、料理に使われるハーブです。',
+      trivia: '中世ヨーロッパでは、戦いに向かう騎士にタイムを贈ったといわれます。',
+      look: { shape: 'cluster', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'honeysuckle', name: 'スイカズラ', kana: 'すいかずら', emoji: '🤍',
+      aliases: ['吸葛', 'ハニーサックル', 'ニンドウ'],
+      meanings: ['愛の絆', '献身的な愛', '友愛'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['love', 'friendship'],
+      description: '白から黄色へ色を変える、甘い香りのつる植物です。',
+      look: { shape: 'trumpet', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'nikko-kisuge', name: 'ニッコウキスゲ', kana: 'にっこうきすげ', emoji: '🧡',
+      aliases: ['日光黄菅', 'ゼンテイカ'],
+      meanings: ['日々あらたに', '心やすらぐ人'],
+      bloomingMonths: [6, 7, 8],
+      categories: [],
+      description: '高原を黄色に染める、一日花のユリの仲間です。',
+      look: { shape: 'star', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hotarubukuro', name: 'ホタルブクロ', kana: 'ほたるぶくろ', emoji: '🌸',
+      aliases: ['蛍袋', 'チョウチンバナ'],
+      meanings: ['愛らしさ', '忠実', '正義'],
+      bloomingMonths: [6, 7],
+      categories: ['love', 'sincerity'],
+      description: 'ちょうちんのような花をうつむけて咲く、野の花です。',
+      trivia: '子どもが花の中に蛍を入れて遊んだことが名前の由来といわれます。',
+      look: { shape: 'bell', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'tsutsuji', name: 'ツツジ', kana: 'つつじ', emoji: '🌺',
+      aliases: ['躑躅'],
+      meanings: ['節度', '慎み', '愛の喜び'],
+      bloomingMonths: [4, 5],
+      categories: ['love', 'happiness'],
+      description: '春の街を色鮮やかに彩る、身近な花木です。',
+      look: { shape: 'round', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'jasmine', name: 'ジャスミン', kana: 'じゃすみん', emoji: '🤍',
+      aliases: ['ソケイ', 'マツリカ'],
+      meanings: ['愛らしさ', '優美', '官能的'],
+      bloomingMonths: [4, 5, 6, 7],
+      categories: ['love'],
+      description: '甘く豊かな香りで知られる白い花です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'southern-magnolia', name: 'タイサンボク', kana: 'たいさんぼく', emoji: '🤍',
+      aliases: ['泰山木'],
+      meanings: ['前途洋々', '壮麗', '威厳'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['future', 'respect'],
+      description: '大きな白い花と、つややかな葉をもつ常緑樹です。',
+      look: { shape: 'round', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'heliotrope', name: 'ヘリオトロープ', kana: 'へりおとろーぷ', emoji: '💜',
+      aliases: ['香水草', 'ニオイムラサキ'],
+      meanings: ['献身的な愛', '夢中', '熱望'],
+      bloomingMonths: [5, 6, 7, 8, 9],
+      categories: ['love'],
+      description: 'バニラのような甘い香りの紫の小花です。',
+      look: { shape: 'cluster', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yellow-cosmos', name: 'キバナコスモス', kana: 'きばなこすもす', emoji: '🧡',
+      aliases: ['黄花秋桜'],
+      meanings: ['野性的な美しさ', '幼い恋心'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['love'],
+      description: 'オレンジや黄色の花を咲かせる、コスモスの仲間です。',
+      look: { shape: 'daisy', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'liatris', name: 'リアトリス', kana: 'りあとりす', emoji: '💜',
+      aliases: ['キリンギク', 'ユリアザミ'],
+      meanings: ['向上心', '燃える思い', '長すぎた恋'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: ['future', 'love'],
+      description: '穂の上から下へ咲き進む、珍しい咲き方の花です。',
+      look: { shape: 'spike', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hollyhock', name: 'タチアオイ', kana: 'たちあおい', emoji: '🌸',
+      aliases: ['立葵', 'ホリホック'],
+      meanings: ['大望', '野心', '豊かな実り'],
+      bloomingMonths: [6, 7, 8],
+      categories: [],
+      description: '背の高い茎に、下から順に花を咲かせる夏の花です。',
+      trivia: 'てっぺんまで咲くと梅雨が明けるといわれます。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'rose-campion', name: 'スイセンノウ', kana: 'すいせんのう', emoji: '🌺',
+      aliases: ['フランネルソウ', 'リクニス'],
+      meanings: ['誠実', '機知', '私の愛は不変'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['sincerity', 'love'],
+      description: '銀色の葉と鮮やかな花の対比が美しい花です。',
+      look: { shape: 'round', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'chestnut', name: 'クリ', kana: 'くり', emoji: '🤍',
+      aliases: ['栗'],
+      meanings: ['満足', '豪奢', '公平'],
+      bloomingMonths: [6],
+      categories: [],
+      description: '初夏に細長い花穂を咲かせ、秋に実をつける木です。',
+      look: { shape: 'spike', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'gamazumi', name: 'ガマズミ', kana: 'がまずみ', emoji: '🤍',
+      aliases: ['莢蒾'],
+      meanings: ['私を見て', '結合'],
+      bloomingMonths: [5, 6],
+      categories: [],
+      description: '白い小花が集まって咲き、秋に赤い実をつける木です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'miyakowasure', name: 'ミヤコワスレ', kana: 'みやこわすれ', emoji: '💜',
+      aliases: ['都忘れ', 'ノシュンギク'],
+      meanings: ['しばしの憩い', '別れ', 'また会う日まで'],
+      bloomingMonths: [4, 5, 6],
+      categories: [],
+      description: '野菊に似た、やさしい紫の花です。',
+      trivia: '佐渡に流された順徳天皇が、この花を見て都を忘れようとしたという言い伝えがあります。',
+      look: { shape: 'daisy', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'biyouyanagi', name: 'ビヨウヤナギ', kana: 'びようやなぎ', emoji: '🌼',
+      aliases: ['美容柳', '未央柳'],
+      meanings: ['有用', '幸い', '多才'],
+      bloomingMonths: [6, 7],
+      categories: ['happiness'],
+      description: '長いおしべが目を引く、黄色い花の低木です。',
+      look: { shape: 'round', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'verbena', name: 'バーベナ', kana: 'ばーべな', emoji: '🌺',
+      aliases: ['ビジョザクラ', '美女桜'],
+      meanings: ['魔力', '魅惑', '家族愛', '協力'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['love'],
+      description: '小花が手毬のようにまとまって咲く花です。',
+      look: { shape: 'cluster', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'otogiriso', name: 'オトギリソウ', kana: 'おとぎりそう', emoji: '🌼',
+      aliases: ['弟切草', 'セントジョーンズワート'],
+      meanings: ['恨み', '秘密', '迷信'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: '黄色い小さな花を咲かせる、薬草として知られる植物です。',
+      look: { shape: 'round', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'bindweed', name: 'ヒルガオ', kana: 'ひるがお', emoji: '🌸',
+      aliases: ['昼顔'],
+      meanings: ['絆', '友達のよしみ', '優しい愛情'],
+      bloomingMonths: [6, 7, 8],
+      categories: ['friendship', 'love', 'kindness'],
+      description: 'アサガオに似た淡いピンクの花を、昼間に咲かせる植物です。',
+      look: { shape: 'trumpet', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'montbretia', name: 'モントブレチア', kana: 'もんとぶれちあ', emoji: '🧡',
+      aliases: ['ヒメヒオウギズイセン', 'クロコスミア'],
+      meanings: ['素晴らしい', '陽気な'],
+      bloomingMonths: [6, 7, 8],
+      categories: ['happiness'],
+      description: '細い茎に朱色の花が並ぶ、夏の球根植物です。',
+      look: { shape: 'star', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'pentas', name: 'ペンタス', kana: 'ぺんたす', emoji: '🌸',
+      aliases: ['クササンタンカ'],
+      meanings: ['願い事', '希望が叶う', '博愛'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['hope', 'love'],
+      description: '星形の小花が集まって咲く、夏に強い花です。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'passion-flower', name: 'トケイソウ', kana: 'とけいそう', emoji: '💜',
+      aliases: ['時計草', 'パッションフラワー'],
+      meanings: ['聖なる愛', '信仰', '受難'],
+      bloomingMonths: [5, 6, 7, 8, 9],
+      categories: ['love'],
+      description: '時計の文字盤のような、不思議な形の花です。',
+      look: { shape: 'star', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'agapanthus', name: 'アガパンサス', kana: 'あがぱんさす', emoji: '💙',
+      aliases: ['ムラサキクンシラン', '紫君子蘭'],
+      meanings: ['愛の訪れ', '恋の訪れ', '知的な装い'],
+      bloomingMonths: [6, 7, 8],
+      categories: ['love'],
+      description: 'すっと伸びた茎の先に、青い花が放射状に咲く花です。',
+      look: { shape: 'star', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'himeyuri', name: 'ヒメユリ', kana: 'ひめゆり', emoji: '🧡',
+      aliases: ['姫百合'],
+      meanings: ['可憐な愛情', '誇り', '強いから美しい'],
+      bloomingMonths: [6, 7],
+      categories: ['love', 'cheer'],
+      description: '小ぶりで上向きに咲く、朱色のユリです。',
+      look: { shape: 'star', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'matsubagiku', name: 'マツバギク', kana: 'まつばぎく', emoji: '🌺',
+      aliases: ['松葉菊'],
+      meanings: ['忍耐', '心広い愛情'],
+      bloomingMonths: [4, 5, 6, 7, 8, 9],
+      categories: ['cheer', 'love'],
+      description: '松葉のような葉と、光沢のある花びらをもつ花です。',
+      look: { shape: 'daisy', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'feijoa', name: 'フェイジョア', kana: 'ふぇいじょあ', emoji: '🌺',
+      aliases: ['パイナップルグアバ'],
+      meanings: ['情熱に燃える心', '実りある人生'],
+      bloomingMonths: [5, 6],
+      categories: [],
+      description: '白い花びらと赤いおしべが印象的な果樹です。',
+      look: { shape: 'round', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'lotus', name: 'ハス', kana: 'はす', emoji: '🌸',
+      aliases: ['蓮', 'ロータス'],
+      meanings: ['清らかな心', '神聖', '雄弁'],
+      bloomingMonths: [7, 8],
+      categories: ['sincerity'],
+      description: '泥の中から清らかな花を咲かせる、夏の水辺の花です。',
+      trivia: '仏教では、泥に染まらず咲く姿が清らかさの象徴とされています。',
+      look: { shape: 'layered', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'acanthus', name: 'アカンサス', kana: 'あかんさす', emoji: '💜',
+      aliases: ['ハアザミ'],
+      meanings: ['芸術', '技巧', '離れない結び目'],
+      bloomingMonths: [6, 7, 8],
+      categories: [],
+      description: '大きな葉と、背の高い花穂をもつ植物です。',
+      trivia: '古代ギリシャの建築で、柱の飾りの模様に使われました。',
+      look: { shape: 'spike', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'safflower', name: 'ベニバナ', kana: 'べにばな', emoji: '🧡',
+      aliases: ['紅花', 'スエツムハナ'],
+      meanings: ['装い', '包容力', '特別な人'],
+      bloomingMonths: [6, 7],
+      categories: [],
+      description: '黄色からオレンジ、赤へと色を変える花です。',
+      trivia: '古くから口紅や染料の原料として使われてきました。',
+      look: { shape: 'round', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'nejibana', name: 'ネジバナ', kana: 'ねじばな', emoji: '🌸',
+      aliases: ['捩花', 'モジズリ'],
+      meanings: ['思慕'],
+      bloomingMonths: [5, 6, 7, 8],
+      categories: ['love'],
+      description: '小さな花がらせん状にねじれて咲く、野生のランです。',
+      look: { shape: 'spike', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'lobelia', name: 'ロベリア', kana: 'ろべりあ', emoji: '💙',
+      aliases: ['ルリチョウソウ', '瑠璃蝶草'],
+      meanings: ['謙遜', 'いつも愛らしい'],
+      bloomingMonths: [4, 5, 6, 7],
+      categories: ['love'],
+      description: '蝶のような小さな花がたくさん咲く花です。',
+      look: { shape: 'round', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hamanasu', name: 'ハマナス', kana: 'はまなす', emoji: '🌺',
+      aliases: ['浜茄子', '浜梨'],
+      meanings: ['悲しくそして美しく', '照り映える容色', '旅の楽しさ'],
+      bloomingMonths: [5, 6, 7, 8],
+      categories: ['future'],
+      description: '海辺の砂地に咲く、香りのよい野生のバラです。',
+      look: { shape: 'round', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'dayflower', name: 'ツユクサ', kana: 'つゆくさ', emoji: '💙',
+      aliases: ['露草', 'ボウシバナ'],
+      meanings: ['尊敬', 'なつかしい関係'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: ['respect'],
+      description: '朝に咲いて昼にはしぼむ、青い小さな花です。',
+      look: { shape: 'round', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hamayu', name: 'ハマユウ', kana: 'はまゆう', emoji: '🤍',
+      aliases: ['浜木綿', 'ハマオモト'],
+      meanings: ['どこか遠くへ', '汚れがない'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: '海辺に咲く、細い花びらの白い花です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hozuki', name: 'ホオズキ', kana: 'ほおずき', emoji: '🧡',
+      aliases: ['鬼灯', '酸漿'],
+      meanings: ['偽り', 'ごまかし', '心の平安'],
+      bloomingMonths: [6, 7],
+      categories: [],
+      description: '夏に赤く色づく、ちょうちんのような袋が特徴の植物です。',
+      trivia: 'お盆に、先祖の霊を導くちょうちんに見立てて飾られます。',
+      look: { shape: 'cup', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'linden', name: 'ボダイジュ', kana: 'ぼだいじゅ', emoji: '🤍',
+      aliases: ['菩提樹', 'リンデン'],
+      meanings: ['夫婦愛', '結婚'],
+      bloomingMonths: [6, 7],
+      categories: ['love'],
+      description: '初夏に香りのよい淡い黄色の花を咲かせる木です。',
+      trivia: 'お釈迦様が悟りを開いたインドボダイジュとは別の種類です。',
+      look: { shape: 'cluster', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hosta', name: 'ギボウシ', kana: 'ぎぼうし', emoji: '💜',
+      aliases: ['擬宝珠', 'ホスタ'],
+      meanings: ['沈静', '落ち着き', '静かな人'],
+      bloomingMonths: [6, 7, 8],
+      categories: [],
+      description: '大きな葉が美しく、日陰の庭で人気の植物です。',
+      look: { shape: 'bell', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'gloxinia', name: 'グロキシニア', kana: 'ぐろきしにあ', emoji: '💜',
+      aliases: ['オオイワギリソウ'],
+      meanings: ['艶麗', '媚態', '欲望'],
+      bloomingMonths: [5, 6, 7, 8, 9],
+      categories: [],
+      description: 'ビロードのような大きな花を咲かせる鉢花です。',
+      look: { shape: 'cup', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'echinops', name: 'ルリタマアザミ', kana: 'るりたまあざみ', emoji: '💙',
+      aliases: ['瑠璃玉薊', 'エキノプス'],
+      meanings: ['権威', '鋭敏', '傷つく心'],
+      bloomingMonths: [7, 8],
+      categories: [],
+      description: '青い球のような花を咲かせる、個性的な植物です。',
+      look: { shape: 'cluster', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yarrow', name: 'ノコギリソウ', kana: 'のこぎりそう', emoji: '🌸',
+      aliases: ['鋸草', 'アキレア', 'ヤロウ'],
+      meanings: ['戦い', '悲嘆をいやす', '勇敢'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: ['cheer'],
+      description: 'のこぎりの歯のような葉と、平たい花房をもつハーブです。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'water-hyacinth', name: 'ホテイアオイ', kana: 'ほていあおい', emoji: '💜',
+      aliases: ['布袋葵', 'ウォーターヒヤシンス'],
+      meanings: ['揺れる心', '恋の悲しみ'],
+      bloomingMonths: [7, 8, 9, 10],
+      categories: [],
+      description: '水面に浮かんで育ち、淡い紫の花を咲かせる植物です。',
+      look: { shape: 'spike', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'amaranthus', name: 'ハゲイトウ', kana: 'はげいとう', emoji: '🌺',
+      aliases: ['葉鶏頭', 'アマランサス', '雁来紅'],
+      meanings: ['不老不死', '情愛'],
+      bloomingMonths: [8, 9, 10, 11],
+      categories: ['love'],
+      description: '秋に葉が赤や黄に色づく、観賞用の植物です。',
+      look: { shape: 'leaf', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'trumpet-vine', name: 'ノウゼンカズラ', kana: 'のうぜんかずら', emoji: '🧡',
+      aliases: ['凌霄花'],
+      meanings: ['名誉', '名声', '華のある人生'],
+      bloomingMonths: [7, 8, 9],
+      categories: ['respect'],
+      description: '夏空に映える、オレンジのラッパ形の花のつる植物です。',
+      look: { shape: 'trumpet', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'silk-tree', name: 'ネムノキ', kana: 'ねむのき', emoji: '🌸',
+      aliases: ['合歓木', 'ネム'],
+      meanings: ['歓喜', '胸のときめき', '創造力'],
+      bloomingMonths: [6, 7],
+      categories: ['happiness'],
+      description: 'ふわふわの刷毛のような花を咲かせる木です。',
+      trivia: '夜になると葉を閉じて眠るように見えることが名前の由来です。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'natsutsubaki', name: 'ナツツバキ', kana: 'なつつばき', emoji: '🤍',
+      aliases: ['夏椿', 'シャラノキ', '沙羅'],
+      meanings: ['愛らしさ', 'はかない美しさ'],
+      bloomingMonths: [6, 7],
+      categories: ['love'],
+      description: '初夏にツバキに似た白い花を咲かせる木です。',
+      look: { shape: 'round', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'portulaca', name: 'ポーチュラカ', kana: 'ぽーちゅらか', emoji: '🌷',
+      aliases: ['ハナスベリヒユ'],
+      meanings: ['いつも元気', '無邪気'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['cheer'],
+      description: '暑さに強く、夏の日差しの中で次々と咲く花です。',
+      look: { shape: 'round', colors: ['#fbb3a0', '#ef7f6c', '#f7d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ginger-lily', name: 'ジンジャー', kana: 'じんじゃー', emoji: '🤍',
+      aliases: ['ハナシュクシャ', '花縮砂', 'ジンジャーリリー'],
+      meanings: ['信頼', '豊かな心'],
+      bloomingMonths: [8, 9, 10],
+      categories: ['sincerity'],
+      description: '蝶のような白い花と、甘い香りをもつ植物です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'butterfly-weed', name: 'トウワタ', kana: 'とうわた', emoji: '🧡',
+      aliases: ['唐綿', 'アスクレピアス'],
+      meanings: ['私を行かせて', '心変わり'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: '赤とオレンジの小花が集まって咲く植物です。',
+      look: { shape: 'cluster', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'aconitum', name: 'トリカブト', kana: 'とりかぶと', emoji: '💜',
+      aliases: ['鳥兜', 'カブトギク'],
+      meanings: ['騎士道', '人嫌い', '復讐'],
+      bloomingMonths: [8, 9, 10],
+      categories: [],
+      description: '舞楽の冠のような形の、紫の花を咲かせる植物です。',
+      trivia: '全草に猛毒があるため、観賞は見るだけにしましょう。',
+      look: { shape: 'spike', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'epiphyllum', name: 'ゲッカビジン', kana: 'げっかびじん', emoji: '🤍',
+      aliases: ['月下美人'],
+      meanings: ['はかない美', 'はかない恋', 'ただ一度だけ会いたくて'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['love'],
+      description: '夜に咲いて一晩でしぼむ、香り高い白い花です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'rudbeckia', name: 'ルドベキア', kana: 'るどべきあ', emoji: '🌼',
+      aliases: ['オオハンゴンソウ', 'ブラックアイドスーザン'],
+      meanings: ['正義', '公平', 'あなたを見つめる'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: [],
+      description: '黄色い花びらと黒い中心が元気な印象の花です。',
+      look: { shape: 'daisy', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'mint', name: 'ミント', kana: 'みんと', emoji: '💜',
+      aliases: ['ハッカ', '薄荷'],
+      meanings: ['美徳', '効能', '暖かい心'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: 'さわやかな香りで親しまれるハーブです。',
+      look: { shape: 'spike', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'matsuyoigusa', name: 'マツヨイグサ', kana: 'まつよいぐさ', emoji: '🌼',
+      aliases: ['待宵草', '宵待草'],
+      meanings: ['物言わぬ恋', 'ほのかな恋'],
+      bloomingMonths: [5, 6, 7, 8],
+      categories: ['love'],
+      description: '夕方に黄色い花を開く、夏の夜の花です。',
+      look: { shape: 'cup', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'cypress-vine', name: 'ルコウソウ', kana: 'るこうそう', emoji: '🌺',
+      aliases: ['縷紅草'],
+      meanings: ['常に愛らしい', 'おせっかい'],
+      bloomingMonths: [7, 8, 9, 10],
+      categories: ['love'],
+      description: '細い葉と、星形の赤い花をもつつる植物です。',
+      look: { shape: 'star', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'impatiens', name: 'インパチェンス', kana: 'いんぱちぇんす', emoji: '🌸',
+      aliases: ['アフリカホウセンカ'],
+      meanings: ['強い個性', '豊かさ'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['cheer'],
+      description: '日陰でもよく咲く、花壇の人気者です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'bougainvillea', name: 'ブーゲンビリア', kana: 'ぶーげんびりあ', emoji: '🌺',
+      aliases: ['イカダカズラ', 'ブーゲンビレア'],
+      meanings: ['情熱', 'あなたは魅力に満ちている', 'あなたしか見えない'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: [],
+      description: '鮮やかな苞が南国を思わせる、つる性の花木です。',
+      trivia: '色づいて見える部分は苞で、本当の花は中の小さな白い部分です。',
+      look: { shape: 'cluster', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'obedient-plant', name: 'ハナトラノオ', kana: 'はなとらのお', emoji: '🌸',
+      aliases: ['花虎の尾', 'カクトラノオ', 'フィソステギア'],
+      meanings: ['希望', '達成', '望みの達成'],
+      bloomingMonths: [7, 8, 9],
+      categories: ['hope'],
+      description: '四角い穂に花が並んで咲く、夏から秋の花です。',
+      look: { shape: 'spike', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'four-oclock', name: 'オシロイバナ', kana: 'おしろいばな', emoji: '🌺',
+      aliases: ['白粉花', 'ミラビリス'],
+      meanings: ['臆病', '内気', '恋を疑う'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['love'],
+      description: '夕方に咲き、翌朝にしぼむ夏の花です。',
+      trivia: '黒い種の中に、おしろいのような白い粉が入っていることが名前の由来です。',
+      look: { shape: 'trumpet', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'cactus', name: 'サボテン', kana: 'さぼてん', emoji: '🌸',
+      aliases: ['仙人掌', 'シャボテン'],
+      meanings: ['燃える心', '枯れない愛', '偉大'],
+      bloomingMonths: [4, 5, 6, 7],
+      categories: ['love'],
+      description: '乾燥に強く、とげのある姿が個性的な植物です。',
+      look: { shape: 'star', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'canna', name: 'カンナ', kana: 'かんな', emoji: '🌺',
+      aliases: ['ハナカンナ', 'ダンドク'],
+      meanings: ['情熱', '快活', '妄想'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['happiness'],
+      description: '大きな葉と鮮やかな花で、夏の花壇を彩る植物です。',
+      look: { shape: 'star', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'moss-rose', name: 'マツバボタン', kana: 'まつばぼたん', emoji: '🌺',
+      aliases: ['松葉牡丹', 'ヒデリソウ'],
+      meanings: ['可憐', '無邪気', '忍耐'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: ['cheer'],
+      description: '松葉のような葉と、鮮やかな花をもつ夏の花です。',
+      look: { shape: 'round', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'buddleja', name: 'ブッドレア', kana: 'ぶっどれあ', emoji: '💜',
+      aliases: ['フサフジウツギ', 'バタフライブッシュ'],
+      meanings: ['恋の予感', 'あなたを慕う', '魅力'],
+      bloomingMonths: [7, 8, 9, 10],
+      categories: ['love'],
+      description: '蝶がよく集まる、香りのよい花穂をもつ花木です。',
+      look: { shape: 'spike', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'santolina', name: 'サントリナ', kana: 'さんとりな', emoji: '🌼',
+      aliases: ['コットンラベンダー', 'ワタスギギク'],
+      meanings: ['悪を遠ざける'],
+      bloomingMonths: [6, 7],
+      categories: [],
+      description: '銀色の葉と、丸い黄色い花をもつハーブです。',
+      look: { shape: 'cluster', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'tritoma', name: 'トリトマ', kana: 'とりとま', emoji: '🧡',
+      aliases: ['シャグマユリ', 'トーチリリー', 'クニフォフィア'],
+      meanings: ['恋する辛さ', 'あなたを思うと胸が痛む'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['love'],
+      description: 'たいまつのような花穂が印象的な花です。',
+      look: { shape: 'spike', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'erica', name: 'エリカ', kana: 'えりか', emoji: '🌸',
+      aliases: ['ヒース', 'ジャノメエリカ'],
+      meanings: ['孤独', '博愛', '謙遜'],
+      bloomingMonths: [1, 2, 3, 4, 11, 12],
+      categories: ['love'],
+      description: '小さな壺形の花が枝いっぱいに咲く花木です。',
+      look: { shape: 'bell', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'spiderwort', name: 'ムラサキツユクサ', kana: 'むらさきつゆくさ', emoji: '💜',
+      aliases: ['紫露草', 'トラデスカンティア'],
+      meanings: ['尊敬しているが恋愛ではない', 'ひとときの幸せ', '貞節'],
+      bloomingMonths: [5, 6, 7],
+      categories: ['love', 'respect', 'happiness'],
+      description: '三枚の花びらをもつ、紫の一日花です。',
+      look: { shape: 'round', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'zinnia', name: 'ジニア', kana: 'じにあ', emoji: '🌸',
+      aliases: ['ヒャクニチソウ', '百日草'],
+      meanings: ['不在の友を思う', '幸福', '絆'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['friendship', 'happiness'],
+      description: '夏から秋まで長く咲き続ける、色鮮やかな花です。',
+      look: { shape: 'layered', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'torenia', name: 'トレニア', kana: 'とれにあ', emoji: '💜',
+      aliases: ['ナツスミレ', 'ハナウリクサ'],
+      meanings: ['ひらめき', '可憐な欲望', '温和'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['kindness'],
+      description: '夏の暑さの中でも咲き続ける、スミレに似た花です。',
+      look: { shape: 'round', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'pomegranate', name: 'ザクロ', kana: 'ざくろ', emoji: '🌺',
+      aliases: ['石榴', '柘榴'],
+      meanings: ['円熟した優雅さ', '互いを思う'],
+      bloomingMonths: [6, 7],
+      categories: [],
+      description: '初夏に朱色の花を咲かせ、秋に実をつける木です。',
+      look: { shape: 'star', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'cleome', name: 'クレオメ', kana: 'くれおめ', emoji: '🌸',
+      aliases: ['セイヨウフウチョウソウ', 'スパイダーフラワー'],
+      meanings: ['秘密のひととき', 'あなたの容姿に酔う'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: '長いおしべが蝶のように見える、夏の花です。',
+      look: { shape: 'spike', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'oleander', name: 'キョウチクトウ', kana: 'きょうちくとう', emoji: '🌸',
+      aliases: ['夾竹桃'],
+      meanings: ['危険', '油断しない', '注意'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: [],
+      description: '暑さや乾燥に強く、夏じゅう咲き続ける花木です。',
+      trivia: '全体に強い毒があるため、枝を燃やしたり口に入れたりしないよう注意が必要です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'streptocarpus', name: 'ストレプトカーパス', kana: 'すとれぷとかーぱす', emoji: '💜',
+      aliases: ['ウシノシタ'],
+      meanings: ['信頼に応える', '清純な愛'],
+      bloomingMonths: [4, 5, 6, 7, 8, 9, 10],
+      categories: ['sincerity', 'love'],
+      description: 'やわらかな色の花が長く咲く鉢花です。',
+      look: { shape: 'trumpet', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'sanvitalia', name: 'サンビタリア', kana: 'さんびたりあ', emoji: '🌼',
+      aliases: ['ジャノメギク', 'ツルハナグルマ'],
+      meanings: ['私を見つめて', 'いつも元気'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['cheer'],
+      description: '小さなヒマワリのような花が地面を覆う花です。',
+      look: { shape: 'daisy', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'black-lily', name: 'クロユリ', kana: 'くろゆり', emoji: '🖤',
+      aliases: ['黒百合', 'エゾクロユリ'],
+      meanings: ['恋', '呪い'],
+      bloomingMonths: [6, 7, 8],
+      categories: ['love'],
+      description: '高山に咲く、暗い紫色の花です。',
+      look: { shape: 'bell', colors: ['#9a7fa0', '#4e3657', '#d9c27a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'tansy', name: 'タンジー', kana: 'たんじー', emoji: '🌼',
+      aliases: ['ヨモギギク'],
+      meanings: ['抵抗', '平和'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: 'ボタンのような黄色い小花をつけるハーブです。',
+      look: { shape: 'cluster', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'sagiso', name: 'サギソウ', kana: 'さぎそう', emoji: '🤍',
+      aliases: ['鷺草'],
+      meanings: ['夢でもあなたを想う', '繊細', '神秘'],
+      bloomingMonths: [7, 8],
+      categories: [],
+      description: '白鷺が羽を広げたような形の、野生のランです。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'goldenrod', name: 'アキノキリンソウ', kana: 'あきのきりんそう', emoji: '🌼',
+      aliases: ['アワダチソウ'],
+      meanings: ['予防', '用心', '警戒'],
+      bloomingMonths: [8, 9, 10, 11],
+      categories: [],
+      description: '秋の野山に咲く、黄色い小花の花穂です。',
+      look: { shape: 'spike', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'common-mallow', name: 'ウスベニアオイ', kana: 'うすべにあおい', emoji: '💜',
+      aliases: ['薄紅葵', 'マロウ', 'コモンマロウ'],
+      meanings: ['穏和', '柔和', '勇気'],
+      bloomingMonths: [6, 7, 8],
+      categories: ['kindness', 'cheer'],
+      description: 'ハーブティーにすると色が変わることで知られるハーブです。',
+      look: { shape: 'round', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ammobium', name: 'アンモビウム', kana: 'あんもびうむ', emoji: '🤍',
+      aliases: ['カイザイク', '貝細工'],
+      meanings: ['不変の誓い', '健康'],
+      bloomingMonths: [6, 7, 8],
+      categories: ['health'],
+      description: 'カサカサした白い花で、ドライフラワーに向く花です。',
+      look: { shape: 'daisy', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ominaeshi', name: 'オミナエシ', kana: 'おみなえし', emoji: '🌼',
+      aliases: ['女郎花'],
+      meanings: ['美人', 'はかない恋', '親切'],
+      bloomingMonths: [8, 9, 10],
+      categories: ['love', 'kindness'],
+      description: '細い茎の先に、黄色い小花を広げる秋の花です。',
+      trivia: '秋の七草のひとつです。',
+      look: { shape: 'cluster', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'datura', name: 'ダチュラ', kana: 'だちゅら', emoji: '🤍',
+      aliases: ['チョウセンアサガオ'],
+      meanings: ['愛敬', '偽りの魅力', 'あなたを崇拝します'],
+      bloomingMonths: [7, 8, 9, 10],
+      categories: ['love'],
+      description: '大きなラッパ形の花を咲かせる植物です。',
+      trivia: '全草に毒があるため、口に入れないよう注意が必要です。',
+      look: { shape: 'trumpet', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'coleus', name: 'コリウス', kana: 'こりうす', emoji: '🌺',
+      aliases: ['ニシキジソ', '錦紫蘇'],
+      meanings: ['かなわぬ恋', '善良な家風', '健康'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['love', 'health'],
+      description: '色とりどりの模様の葉を楽しむ植物です。',
+      look: { shape: 'leaf', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'blueberry', name: 'ブルーベリー', kana: 'ぶるーべりー', emoji: '🤍',
+      aliases: [],
+      meanings: ['実りのある人生', '知性', '信頼'],
+      bloomingMonths: [4, 5],
+      categories: ['sincerity'],
+      description: '春に白い壺形の花を咲かせ、夏に実をつける果樹です。',
+      look: { shape: 'bell', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'curcuma', name: 'クルクマ', kana: 'くるくま', emoji: '🌸',
+      aliases: ['シャムチューリップ'],
+      meanings: ['あなたの姿に酔いしれる', '忍耐'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['cheer'],
+      description: 'チューリップのような苞が美しい、ウコンの仲間です。',
+      look: { shape: 'cup', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'burnet', name: 'ワレモコウ', kana: 'われもこう', emoji: '❤️',
+      aliases: ['吾亦紅', '吾木香'],
+      meanings: ['変化', '移ろい', '愛慕', 'もの思い'],
+      bloomingMonths: [8, 9, 10],
+      categories: ['love'],
+      description: '赤褐色の小さな花穂が秋風にゆれる花です。',
+      look: { shape: 'cluster', colors: ['#c77a88', '#8e3a52', '#e8c36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'new-york-aster', name: 'ユウゼンギク', kana: 'ゆうぜんぎく', emoji: '💜',
+      aliases: ['友禅菊', 'ニューヨークアスター', '宿根アスター'],
+      meanings: ['老いても元気で', '深い愛'],
+      bloomingMonths: [9, 10],
+      categories: ['cheer', 'love'],
+      description: '紫の小菊がたくさん咲く、秋の花です。',
+      look: { shape: 'daisy', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'balsam', name: 'ホウセンカ', kana: 'ほうせんか', emoji: '🌸',
+      aliases: ['鳳仙花', 'ツマクレナイ'],
+      meanings: ['私に触れないで', '短気', '心を開く'],
+      bloomingMonths: [6, 7, 8, 9],
+      categories: [],
+      description: '夏に咲き、熟した実に触れると種がはじけ飛ぶ花です。',
+      trivia: '昔は花で爪を染めて遊んだことから「ツマクレナイ」とも呼ばれました。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yugao', name: 'ユウガオ', kana: 'ゆうがお', emoji: '🤍',
+      aliases: ['夕顔'],
+      meanings: ['夜', 'はかない恋'],
+      bloomingMonths: [7, 8, 9],
+      categories: ['love'],
+      description: '夕方に白い花を開く、ウリの仲間です。',
+      trivia: '実はかんぴょうの原料になります。',
+      look: { shape: 'trumpet', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hypericum', name: 'ヒペリカム', kana: 'ひぺりかむ', emoji: '🌼',
+      aliases: ['コボウズオトギリ'],
+      meanings: ['きらめき', '悲しみは続かない'],
+      bloomingMonths: [6, 7],
+      categories: [],
+      description: '黄色い花のあとにつける、つややかな実も人気の植物です。',
+      look: { shape: 'round', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'currant', name: 'スグリ', kana: 'すぐり', emoji: '🌿',
+      aliases: ['グーズベリー', 'カラント'],
+      meanings: ['あなたの不機嫌が私を悩ませる', '予想'],
+      bloomingMonths: [4, 5],
+      categories: [],
+      description: '小さな花のあとに、透きとおる実をつける果樹です。',
+      look: { shape: 'bell', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'crape-myrtle', name: 'サルスベリ', kana: 'さるすべり', emoji: '🌸',
+      aliases: ['百日紅'],
+      meanings: ['雄弁', '愛嬌', '不用意'],
+      bloomingMonths: [7, 8, 9, 10],
+      categories: ['love'],
+      description: '夏から秋まで長く咲き続ける、フリルのような花の木です。',
+      trivia: '幹がつるつるで、猿も滑り落ちそうなことが名前の由来です。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'begonia-grandis', name: 'シュウカイドウ', kana: 'しゅうかいどう', emoji: '🌸',
+      aliases: ['秋海棠', 'ヨウラクソウ'],
+      meanings: ['片思い', '恋の悩み', '繊細'],
+      bloomingMonths: [8, 9, 10],
+      categories: ['love'],
+      description: '秋の日陰に、淡いピンクの花をうつむけて咲かせます。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'salvia', name: 'サルビア', kana: 'さるびあ', emoji: '🌺',
+      aliases: ['ヒゴロモソウ', '緋衣草'],
+      meanings: ['尊敬', '知恵', '家族愛'],
+      colorMeanings: [{ color: '赤', hex: '#e2566a', meanings: ['燃える思い'] }, { color: '青', hex: '#8fa9e8', meanings: ['尊敬', '知恵'] }],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['respect', 'love'],
+      description: '燃えるような赤い花穂が、夏の花壇を彩る花です。',
+      look: { shape: 'spike', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'spathiphyllum', name: 'スパティフィラム', kana: 'すぱてぃふぃらむ', emoji: '🤍',
+      aliases: ['ササウチワ'],
+      meanings: ['上品な淑女', '清らかな心'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['sincerity'],
+      description: '白い仏炎苞がすっと立つ、清楚な観葉植物です。',
+      look: { shape: 'trumpet', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'oniyuri', name: 'オニユリ', kana: 'おにゆり', emoji: '🧡',
+      aliases: ['鬼百合', 'テンガイユリ'],
+      meanings: ['賢者', '陽気', '富と誇り'],
+      bloomingMonths: [7, 8],
+      categories: ['respect', 'happiness'],
+      description: '反り返った朱色の花びらに斑点がある、力強いユリです。',
+      look: { shape: 'star', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'grape', name: 'ブドウ', kana: 'ぶどう', emoji: '🌿',
+      aliases: ['葡萄'],
+      meanings: ['好意', '信頼', '陶酔'],
+      bloomingMonths: [5, 6],
+      categories: ['sincerity'],
+      description: '初夏に小さな花を咲かせ、秋に房状の実をつける果樹です。',
+      look: { shape: 'cluster', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'misohagi', name: 'ミソハギ', kana: 'みそはぎ', emoji: '🌺',
+      aliases: ['禊萩', 'ボンバナ', '精霊花'],
+      meanings: ['悲哀', '愛の悲しみ', '純真な愛情'],
+      bloomingMonths: [7, 8],
+      categories: ['love', 'sincerity'],
+      description: 'お盆のころに咲き、供花にされてきた花です。',
+      look: { shape: 'spike', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'zephyranthes', name: 'ゼフィランサス', kana: 'ぜふぃらんさす', emoji: '🤍',
+      aliases: ['タマスダレ', 'サフランモドキ', 'レインリリー'],
+      meanings: ['汚れなき愛', '期待', '便りがある'],
+      bloomingMonths: [7, 8, 9, 10],
+      categories: ['love', 'hope'],
+      description: '雨のあとに一斉に咲くことが多い、可憐な球根植物です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'aloe', name: 'アロエ', kana: 'あろえ', emoji: '🧡',
+      aliases: ['キダチアロエ', '医者いらず'],
+      meanings: ['健康', '万能', '苦痛'],
+      bloomingMonths: [1, 2, 12],
+      categories: ['health'],
+      description: '肉厚の葉をもつ多肉植物で、冬に朱色の花を咲かせます。',
+      look: { shape: 'spike', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'indigo', name: 'アイ', kana: 'あい', emoji: '🌸',
+      aliases: ['藍', 'タデアイ'],
+      meanings: ['美しい装い', 'あなたのためなら死ねる'],
+      bloomingMonths: [8, 9, 10],
+      categories: [],
+      description: '葉から藍色の染料がとれる、タデの仲間です。',
+      look: { shape: 'spike', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'japanese-anemone', name: 'シュウメイギク', kana: 'しゅうめいぎく', emoji: '🌸',
+      aliases: ['秋明菊', 'キブネギク', '貴船菊'],
+      meanings: ['薄れゆく愛', '忍耐', '淡い思い'],
+      bloomingMonths: [9, 10, 11],
+      categories: ['love', 'cheer'],
+      description: '秋風にゆれる、しなやかな茎の花です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'susuki', name: 'ススキ', kana: 'すすき', emoji: '🤍',
+      aliases: ['薄', '尾花', 'カヤ'],
+      meanings: ['活力', '心が通じる', 'なびく心'],
+      bloomingMonths: [8, 9, 10],
+      categories: ['cheer'],
+      description: '秋の野原で銀色の穂をなびかせる植物です。',
+      trivia: '秋の七草の「尾花」はススキのことで、十五夜のお供えにも使われます。',
+      look: { shape: 'spike', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'akane', name: 'アカネ', kana: 'あかね', emoji: '🤍',
+      aliases: ['茜'],
+      meanings: ['私を思って', '媚び'],
+      bloomingMonths: [8, 9, 10],
+      categories: [],
+      description: '根から赤い染料がとれる、つる性の植物です。',
+      look: { shape: 'cluster', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'balloon-vine', name: 'フウセンカズラ', kana: 'ふうせんかずら', emoji: '🌿',
+      aliases: ['風船葛'],
+      meanings: ['一緒に飛びたい', 'あなたと飛び立ちたい', '自由な心'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: '風船のような実がかわいらしい、つる植物です。',
+      look: { shape: 'cup', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'misebaya', name: 'ミセバヤ', kana: 'みせばや', emoji: '🌸',
+      aliases: ['玉緒', 'タマノオ'],
+      meanings: ['大切なあなた', 'つつましい', '静穏'],
+      bloomingMonths: [10, 11],
+      categories: [],
+      description: '丸い葉と、ピンクの小花の房をもつ多肉植物です。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yaburan', name: 'ヤブラン', kana: 'やぶらん', emoji: '💜',
+      aliases: ['藪蘭', 'リリオペ'],
+      meanings: ['謙遜', '忍耐', '隠された心'],
+      bloomingMonths: [8, 9, 10],
+      categories: ['cheer'],
+      description: '日陰に紫の花穂を立てる、丈夫な植物です。',
+      look: { shape: 'spike', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'colchicum', name: 'コルチカム', kana: 'こるちかむ', emoji: '🌸',
+      aliases: ['イヌサフラン'],
+      meanings: ['悔いなき青春', '危険な美しさ', '私の最良の日々は過ぎ去った'],
+      bloomingMonths: [9, 10],
+      categories: [],
+      description: '球根を置いておくだけで花が咲く、秋の球根植物です。',
+      trivia: '全草に毒があるため、扱いには注意が必要です。',
+      look: { shape: 'cup', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'sawagikyo', name: 'サワギキョウ', kana: 'さわぎきょう', emoji: '💜',
+      aliases: ['沢桔梗'],
+      meanings: ['特異な才能', '高貴'],
+      bloomingMonths: [8, 9],
+      categories: ['respect'],
+      description: '湿原に咲く、深い紫の花です。',
+      look: { shape: 'star', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'hagi', name: 'ハギ', kana: 'はぎ', emoji: '🌺',
+      aliases: ['萩', 'ヤマハギ'],
+      meanings: ['思案', '内気', '想い'],
+      bloomingMonths: [7, 8, 9, 10],
+      categories: [],
+      description: 'しなやかな枝に小さな赤紫の花をつける、秋の花です。',
+      trivia: '秋の七草のひとつで、万葉集に最も多く詠まれた植物ともいわれます。',
+      look: { shape: 'cluster', colors: ['#f3a6d6', '#d45aa6', '#f5d86a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'fujibakama', name: 'フジバカマ', kana: 'ふじばかま', emoji: '🌸',
+      aliases: ['藤袴', '蘭草'],
+      meanings: ['ためらい', 'あの日を思い出す', '優しい思い出'],
+      bloomingMonths: [8, 9, 10],
+      categories: ['comfort', 'kindness'],
+      description: '淡い紫の小花が集まって咲く、秋の七草のひとつです。',
+      trivia: '旅をする蝶アサギマダラがよく集まる花として知られています。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'helenium', name: 'ヘレニウム', kana: 'へれにうむ', emoji: '🧡',
+      aliases: ['ダンゴギク', '団子菊'],
+      meanings: ['上機嫌', '涙'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: [],
+      description: '丸く盛り上がった中心が団子のように見える花です。',
+      look: { shape: 'daisy', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'monstera', name: 'モンステラ', kana: 'もんすてら', emoji: '🌿',
+      aliases: ['ホウライショウ'],
+      meanings: ['うれしい便り', '壮大な計画', '深い関係'],
+      categories: ['hope'],
+      description: '切れ込みのある大きな葉が特徴の観葉植物です。',
+      look: { shape: 'leaf', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'toad-lily', name: 'ホトトギス', kana: 'ほととぎす', emoji: '💜',
+      aliases: ['杜鵑草', '油点草'],
+      meanings: ['永遠にあなたのもの', '秘めた意志'],
+      bloomingMonths: [8, 9, 10, 11],
+      categories: [],
+      description: '斑点のある花びらが個性的な、日本の山野草です。',
+      trivia: '花の斑点が、鳥のホトトギスの胸の模様に似ていることが名前の由来です。',
+      look: { shape: 'star', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'bouvardia', name: 'ブバルディア', kana: 'ぶばるでぃあ', emoji: '🌸',
+      aliases: ['カンチョウジ', '寒丁子'],
+      meanings: ['交流', '親交', '夢'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: [],
+      description: '十字形の小花が集まって咲く、ブーケに人気の花です。',
+      look: { shape: 'star', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'nerine', name: 'ネリネ', kana: 'ねりね', emoji: '🌸',
+      aliases: ['ダイヤモンドリリー', '姫彼岸花'],
+      meanings: ['また会う日を楽しみに', '幸せな思い出', '忍耐'],
+      bloomingMonths: [10, 11, 12],
+      categories: ['happiness', 'comfort', 'cheer'],
+      description: '花びらがダイヤモンドのようにきらめく花です。',
+      look: { shape: 'star', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'shimotsuke', name: 'シモツケ', kana: 'しもつけ', emoji: '🌸',
+      aliases: ['下野', 'スピラエア'],
+      meanings: ['整然', '自由'],
+      bloomingMonths: [5, 6, 7, 8],
+      categories: [],
+      description: '小花が集まって平たく咲く、初夏の花木です。',
+      look: { shape: 'cluster', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'beautyberry', name: 'ムラサキシキブ', kana: 'むらさきしきぶ', emoji: '💜',
+      aliases: ['紫式部', 'ミムラサキ'],
+      meanings: ['聡明', '上品', '愛され上手'],
+      bloomingMonths: [6, 7],
+      categories: ['love'],
+      description: '秋に紫色の実が美しく色づく木です。',
+      look: { shape: 'cluster', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'begonia', name: 'ベゴニア', kana: 'べごにあ', emoji: '🌸',
+      aliases: ['センパフローレンス'],
+      meanings: ['片思い', '愛の告白', '親切'],
+      bloomingMonths: [4, 5, 6, 7, 8, 9, 10, 11],
+      categories: ['love', 'kindness'],
+      description: 'つやのある葉と、長く咲く花が人気の鉢花です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'crown-of-thorns', name: 'ハナキリン', kana: 'はなきりん', emoji: '🌺',
+      aliases: ['花麒麟', 'ユーフォルビア・ミリー'],
+      meanings: ['早くキスして', '自立', '独立'],
+      bloomingMonths: [3, 4, 5, 6, 7, 8, 9, 10, 11],
+      categories: ['love'],
+      description: 'とげのある茎に、かわいらしい赤い苞をつける植物です。',
+      look: { shape: 'cluster', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'akebi', name: 'アケビ', kana: 'あけび', emoji: '💜',
+      aliases: ['木通', '通草'],
+      meanings: ['唯一の恋', '才能'],
+      bloomingMonths: [4, 5],
+      categories: ['love'],
+      description: '春に紫の花を咲かせ、秋に実がぱっくり開くつる植物です。',
+      look: { shape: 'round', colors: ['#b9a0ea', '#8466cf', '#f3dd72'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'ginkgo', name: 'イチョウ', kana: 'いちょう', emoji: '🌼',
+      aliases: ['銀杏'],
+      meanings: ['荘厳', '長寿', '鎮魂'],
+      bloomingMonths: [4, 5],
+      categories: ['respect', 'health'],
+      description: '扇形の葉が秋に黄金色に染まる木です。',
+      trivia: '恐竜の時代から姿をほとんど変えていない「生きた化石」と呼ばれます。',
+      look: { shape: 'leaf', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'lantana', name: 'ランタナ', kana: 'らんたな', emoji: '🧡',
+      aliases: ['シチヘンゲ', '七変化'],
+      meanings: ['心変わり', '合意', '協力'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10, 11],
+      categories: [],
+      description: '咲きながら花の色が変わっていく、小花の集まりです。',
+      look: { shape: 'cluster', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'pachira', name: 'パキラ', kana: 'ぱきら', emoji: '🌿',
+      aliases: ['発財樹'],
+      meanings: ['快活', '勝利'],
+      categories: ['happiness', 'cheer'],
+      description: '手のひらのような葉が広がる、人気の観葉植物です。',
+      look: { shape: 'leaf', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'heliconia', name: 'ヘリコニア', kana: 'へりこにあ', emoji: '🌺',
+      aliases: ['ロブスタークロウ'],
+      meanings: ['注目', '脚光を浴びる'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: [],
+      description: '鮮やかな苞がジグザグに連なる、熱帯の植物です。',
+      look: { shape: 'star', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'maple', name: 'カエデ', kana: 'かえで', emoji: '🌺',
+      aliases: ['楓', 'モミジ'],
+      meanings: ['大切な思い出', '美しい変化', '遠慮'],
+      bloomingMonths: [4, 5],
+      categories: ['comfort'],
+      description: '秋の紅葉で野山を染める木です。',
+      look: { shape: 'leaf', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'eucalyptus', name: 'ユーカリ', kana: 'ゆーかり', emoji: '🌿',
+      aliases: [],
+      meanings: ['再生', '思い出', '新生'],
+      categories: ['comfort'],
+      description: '銀色がかった丸い葉が美しく、コアラの食べ物としても知られる木です。',
+      look: { shape: 'leaf', colors: ['#c9ddd6', '#8fb5aa', '#5f8a7e'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'euryops', name: 'ユリオプスデージー', kana: 'ゆりおぷすでーじー', emoji: '🌼',
+      aliases: ['ユリオプスデイジー'],
+      meanings: ['円満な関係', '明るい愛', '夫婦円満'],
+      bloomingMonths: [1, 2, 3, 4, 5, 11, 12],
+      categories: ['love'],
+      description: '銀色の葉と黄色い花が、冬の庭を明るくする花です。',
+      look: { shape: 'daisy', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'holly', name: 'ヒイラギ', kana: 'ひいらぎ', emoji: '🤍',
+      aliases: ['柊'],
+      meanings: ['用心深さ', '先見の明', '保護'],
+      bloomingMonths: [11, 12],
+      categories: [],
+      description: 'とげのある葉と、白く香りのよい小花をもつ木です。',
+      trivia: '節分に柊の枝を飾る風習があります。クリスマスに飾る赤い実の「セイヨウヒイラギ」とは別の植物です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'manettia', name: 'マネッチア', kana: 'まねっちあ', emoji: '🌺',
+      aliases: [],
+      meanings: ['楽しいおしゃべり', '話上手'],
+      bloomingMonths: [4, 5, 6, 7, 8, 9, 10],
+      categories: ['happiness'],
+      description: '赤と黄色の筒形の花が、おしゃべりしているように並ぶつる植物です。',
+      look: { shape: 'trumpet', colors: ['#f2848f', '#d8425d', '#f3d56b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'fuyo', name: 'フヨウ', kana: 'ふよう', emoji: '🌸',
+      aliases: ['芙蓉'],
+      meanings: ['繊細な美', 'しとやかな恋人'],
+      bloomingMonths: [7, 8, 9, 10],
+      categories: ['love'],
+      description: '夏の朝に大きな淡いピンクの花を開く花木です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'karasuuri', name: 'カラスウリ', kana: 'からすうり', emoji: '🤍',
+      aliases: ['烏瓜'],
+      meanings: ['よい便り', '誠実'],
+      bloomingMonths: [7, 8, 9],
+      categories: ['hope', 'sincerity'],
+      description: '夏の夜にレースのような白い花を咲かせるつる植物です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'lemon', name: 'レモン', kana: 'れもん', emoji: '🤍',
+      aliases: ['檸檬'],
+      meanings: ['誠実な愛', '心からの思慕', '思慮分別'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['love', 'sincerity'],
+      description: '香りのよい白い花を咲かせる柑橘です。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'rowan', name: 'ナナカマド', kana: 'ななかまど', emoji: '🤍',
+      aliases: ['七竈'],
+      meanings: ['慎重', '私はあなたを見守る', '安全'],
+      bloomingMonths: [5, 6, 7],
+      categories: [],
+      description: '秋の赤い実と紅葉が美しい木です。',
+      trivia: '七度かまどに入れても燃え残るほど燃えにくいことが名前の由来といわれます。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'tree-dahlia', name: 'コウテイダリア', kana: 'こうていだりあ', emoji: '💜',
+      aliases: ['皇帝ダリア', '木立ダリア'],
+      meanings: ['乙女の真心', '乙女の純潔'],
+      bloomingMonths: [11, 12],
+      categories: ['sincerity'],
+      description: '背の高い茎の先に、淡い紫の花を咲かせるダリアです。',
+      look: { shape: 'round', colors: ['#d6c8f2', '#ab94e0', '#f7eab0'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'himejoon', name: 'ヒメジョオン', kana: 'ひめじょおん', emoji: '🤍',
+      aliases: ['姫女菀'],
+      meanings: ['素朴で清楚'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['sincerity'],
+      description: '道ばたに咲く、小さな白い菊のような花です。',
+      look: { shape: 'daisy', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'tsuwabuki', name: 'ツワブキ', kana: 'つわぶき', emoji: '🌼',
+      aliases: ['石蕗'],
+      meanings: ['謙譲', '困難に負けない', '愛よ甦れ'],
+      bloomingMonths: [10, 11, 12],
+      categories: ['cheer', 'love'],
+      description: 'つやのある葉と、黄色い花が晩秋の庭を彩る植物です。',
+      look: { shape: 'daisy', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'angraecum', name: 'アングレカム', kana: 'あんぐれかむ', emoji: '🤍',
+      aliases: [],
+      meanings: ['いつまでもあなたと一緒', '祈り'],
+      bloomingMonths: [1, 2, 3, 12],
+      categories: [],
+      description: '星形の白い花を咲かせる、上品なランです。',
+      look: { shape: 'star', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'strelitzia', name: 'ストレリチア', kana: 'すとれりちあ', emoji: '🧡',
+      aliases: ['極楽鳥花', 'ゴクラクチョウカ'],
+      meanings: ['輝かしい未来', '寛容', '気取った恋'],
+      bloomingMonths: [5, 6, 7, 8, 9, 10],
+      categories: ['future', 'love'],
+      description: '極楽鳥が羽を広げたような花を咲かせる植物です。',
+      look: { shape: 'star', colors: ['#fbb77d', '#f38a4a', '#b85a2a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'pyracantha', name: 'ピラカンサ', kana: 'ぴらかんさ', emoji: '🤍',
+      aliases: ['タチバナモドキ', 'トキワサンザシ'],
+      meanings: ['慈悲', '美しさはあなたの魅力', '愛嬌'],
+      bloomingMonths: [5, 6],
+      categories: ['love'],
+      description: '秋から冬に赤や黄色の実をたくさんつける木です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'karin', name: 'カリン', kana: 'かりん', emoji: '🌸',
+      aliases: ['花梨'],
+      meanings: ['豊麗', '唯一の恋', '努力'],
+      bloomingMonths: [4, 5],
+      categories: ['love'],
+      description: '春に淡いピンクの花を咲かせ、香りのよい実をつける木です。',
+      look: { shape: 'round', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'dracaena', name: 'ドラセナ', kana: 'どらせな', emoji: '🌿',
+      aliases: ['幸福の木', 'ドラセナ・フラグランス'],
+      meanings: ['幸福', '幸せな恋'],
+      categories: ['happiness', 'love'],
+      description: 'すっと伸びた幹と葉が美しい観葉植物です。',
+      look: { shape: 'leaf', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'nandina', name: 'ナンテン', kana: 'なんてん', emoji: '🤍',
+      aliases: ['南天'],
+      meanings: ['私の愛は増すばかり', '良い家庭', '機知に富む'],
+      bloomingMonths: [5, 6],
+      categories: ['love'],
+      description: '冬に赤い実をつける、縁起のよい木です。',
+      trivia: '「難を転ずる」に通じることから、縁起木として親しまれています。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'loquat', name: 'ビワ', kana: 'びわ', emoji: '🤍',
+      aliases: ['枇杷'],
+      meanings: ['温和', '治癒', 'あなたに打ち明ける'],
+      bloomingMonths: [1, 2, 11, 12],
+      categories: ['kindness', 'health'],
+      description: '冬に香りのよい花を咲かせ、初夏に実をつける果樹です。',
+      look: { shape: 'cluster', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'christmas-cactus', name: 'シャコバサボテン', kana: 'しゃこばさぼてん', emoji: '🌸',
+      aliases: ['クリスマスカクタス', 'デンマークカクタス'],
+      meanings: ['美しい眺め', '一時の美', '冒険心'],
+      bloomingMonths: [1, 11, 12],
+      categories: [],
+      description: 'クリスマスのころに咲く、葉が連なった形のサボテンです。',
+      look: { shape: 'star', colors: ['#f9c1d0', '#ec8aa6', '#f5d05c'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'yatsude', name: 'ヤツデ', kana: 'やつで', emoji: '🤍',
+      aliases: ['八手', '天狗の羽団扇'],
+      meanings: ['分別', '親しみ', '健康'],
+      bloomingMonths: [10, 11, 12],
+      categories: ['health'],
+      description: '手のひらのような大きな葉と、白い花の玉をもつ木です。',
+      look: { shape: 'cluster', colors: ['#ffffff', '#ece6e0', '#f2d46b'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'pineapple', name: 'パイナップル', kana: 'ぱいなっぷる', emoji: '🌼',
+      aliases: ['パイン', '鳳梨'],
+      meanings: ['あなたは完璧', '完全無欠'],
+      bloomingMonths: [7, 8, 9],
+      categories: [],
+      description: '甘い実で知られる、トロピカルな植物です。',
+      look: { shape: 'spike', colors: ['#fbe27a', '#f2c23c', '#e0a52a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'platanus', name: 'プラタナス', kana: 'ぷらたなす', emoji: '🌿',
+      aliases: ['スズカケノキ', '鈴懸の木'],
+      meanings: ['天才', '好奇心'],
+      bloomingMonths: [4, 5],
+      categories: [],
+      description: '大きな葉が木陰をつくる、街路樹でおなじみの木です。',
+      look: { shape: 'leaf', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'mistletoe', name: 'ヤドリギ', kana: 'やどりぎ', emoji: '🌿',
+      aliases: ['宿り木', '寄生木', 'ミスルトー'],
+      meanings: ['私にキスして', '困難に打ち克つ', '忍耐'],
+      bloomingMonths: [2, 3],
+      categories: ['love', 'cheer'],
+      description: 'ほかの木の枝に寄生して育つ、丸い姿の植物です。',
+      trivia: 'ヨーロッパには、クリスマスにヤドリギの下でキスをする習慣があります。',
+      look: { shape: 'cluster', colors: ['#c4dfb0', '#86b577', '#5c8a55'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'plumeria', name: 'プルメリア', kana: 'ぷるめりあ', emoji: '🤍',
+      aliases: ['インドソケイ', 'フランジパニ'],
+      meanings: ['気品', '恵まれた人', '陽だまり'],
+      bloomingMonths: [6, 7, 8, 9, 10],
+      categories: ['respect'],
+      description: '甘い香りの花で、ハワイのレイにも使われる花です。',
+      look: { shape: 'star', colors: ['#fdf5dc', '#eadcae', '#c9b36a'] },
+      sources: ['hananokotoba']
+    },
+    {
+      id: 'veronica-persica', name: 'オオイヌノフグリ', kana: 'おおいぬのふぐり', emoji: '💙',
+      aliases: ['星の瞳', '瑠璃唐草'],
+      meanings: ['信頼', '清らか', '忠実'],
+      bloomingMonths: [2, 3, 4, 5],
+      categories: ['sincerity'],
+      description: '早春の道ばたに咲く、小さな青い花です。',
+      look: { shape: 'round', colors: ['#a9c4f2', '#6b8fe0', '#f3e38a'] },
+      sources: ['hananokotoba']
     }
   ];
 })();
